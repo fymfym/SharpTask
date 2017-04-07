@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpTaskExecuter", "SharpT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpTaskSampleTask", "SharpTaskSampleTask\SharpTaskSampleTask.csproj", "{F14F97B8-EEF7-4CC8-91AF-D05DE64744E1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharTaskTest", "SharTaskTest\SharTaskTest.csproj", "{AE70C604-0114-4C2F-8714-99B623EEE2FE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpTaskTest", "SharpTaskTest\SharpTaskTest.csproj", "{AE70C604-0114-4C2F-8714-99B623EEE2FE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

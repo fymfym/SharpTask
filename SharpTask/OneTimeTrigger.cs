@@ -8,33 +8,48 @@ namespace SharpTaskTask
 {
     public class OneTimeTrigger : TaskTriggerInterface
     {
-        public DateTime TriggerOnce;
-        public string Name {get; set;}
-
-        public int CheckSequence
+        string _name;
+        string _description;
+        public string Name
         {
             get
             {
-                throw new NotImplementedException();
+                return _name;
             }
-
             set
             {
-                throw new NotImplementedException();
+                _name = value;
             }
         }
+
+        public string Description
+        {
+            get
+            {
+                return _description;
+            }
+            set
+            {
+                _description = value;
+            }
+        }
+
+        public int Sequence { get; set; }
+
+        public DateTime StartDateTime { get; set; }
 
         DateTime _triggerDateTime;
 
         public OneTimeTrigger(DateTime TriggerDateTime)
         {
             _triggerDateTime = TriggerDateTime;
-            Name = "One time trigger";
+            _name = "OneTimeTrigger";
+            _description = "Executes at 'StartDateTime' only";
         }
 
         public override string ToString()
         {
-            return string.Format("Name: {0} - TriggerOnce: {1}", Name, TriggerOnce.ToString());
+            return string.Format("Name: {0} - TriggerOnce: {1}", Name, StartDateTime.ToString());
         }
 
         public bool ShouldRunNow(DateTime CurrentTime)

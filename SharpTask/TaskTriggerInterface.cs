@@ -8,8 +8,10 @@ namespace SharpTaskTask
 {
     public interface TaskTriggerInterface
     {
+        DateTime StartDateTime { get; set; }
         string Name { get; set; }
-        int CheckSequence { get; set; }
+        string Description { get; set; }
+        int Sequence { get; set; }
         bool ShouldRunNow(DateTime CurrentTime);
     }
 }
