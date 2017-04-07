@@ -44,16 +44,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SharpTaskExecuterTest\SharpTaskExecuterEnquedTaskWeekly.cs" />
-    <Compile Include="SharpTaskExecuterTest\SharpTaskExecuterEnquedTaskOnTime.cs" />
+    <Compile Include="SharpTaskExecuterTest\SharpTaskExecuterEnquedRepeatDailyTest.cs" />
+    <Compile Include="SharpTaskExecuterTest\SharpTaskExecuterEnquedTaskWeeklyTest.cs" />
+    <Compile Include="SharpTaskExecuterTest\SharpTaskExecuterEnquedTaskOnTimeTest.cs" />
+    <Compile Include="SharpTaskExecuterTest\TestHelpers\TaskREpeatDailyTriggerMoFr1215.cs" />
     <Compile Include="SharpTaskExecuterTest\TestHelpers\TaskWeeklyTriggerMonday.cs" />
     <Compile Include="SharpTaskExecuterTest\TestHelpers\TaskOneTimeTrigger201701011200.cs" />
     <Compile Include="SharpTaskExecuterTest\TestHelpers\TemporaryTask.cs" />
+    <Compile Include="SharpTaskTaskTest\RepeatDailyTriggerTest.cs" />
     <Compile Include="SharpTaskTaskTest\WeekdayTriggerTest.cs" />
     <Compile Include="SharpTaskTaskTest\OneTimeTriggerTest.cs" />
     <Compile Include="SharpTaskTaskTest\SharkTaskTaskRunResultTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SharpTaskExecuterTest\SharpTaskExecuterEnquedTask.cs" />
+    <Compile Include="SharpTaskExecuterTest\SharpTaskExecuterEnquedTaskTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

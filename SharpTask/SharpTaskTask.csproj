@@ -46,9 +46,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Date.cs" />
+    <Compile Include="Helpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Time.cs" />
     <Compile Include="WeekdayTrigger.cs" />
-    <Compile Include="RepeatTrigger.cs" />
+    <Compile Include="RepeatDailyTrigger.cs" />
     <Compile Include="RunResult.cs" />
     <Compile Include="OneTimeTrigger.cs" />
     <Compile Include="SharpTaskInterface.cs" />

@@ -36,25 +36,27 @@ namespace SharpTaskTask
 
         public int Sequence { get; set; }
 
-        public DateTime StartDateTime { get; set; }
+        public Date StartDate { get; set; }
 
-        DateTime _triggerDateTime;
+        Date _triggerDate;
+        Time _triggerTime;
 
-        public OneTimeTrigger(DateTime TriggerDateTime)
+        public OneTimeTrigger(Date TriggerDate, Time TriggerTime)
         {
-            _triggerDateTime = TriggerDateTime;
+            _triggerDate = TriggerDate;
+            _triggerTime = TriggerTime;
             _name = "OneTimeTrigger";
             _description = "Executes at 'StartDateTime' only";
         }
 
         public override string ToString()
         {
-            return string.Format("Name: {0} - TriggerOnce: {1}", Name, StartDateTime.ToString());
+            return string.Format("Name: {0} - TriggerOnce: {1}", Name, StartDate.ToString());
         }
 
         public bool ShouldRunNow(DateTime CurrentTime)
         {
-            var ts = new TimeSpan(CurrentTime.Ticks - _triggerDateTime.Ticks).TotalSeconds;
+            var ts = new TimeSpan(CurrentTime.Ticks - (_triggerDate.Ticks + _triggerTime.Ticks)).TotalSeconds;
             if (ts < 0) return false;
             if ((ts >= 0) && (ts <= 5)) return true;
 

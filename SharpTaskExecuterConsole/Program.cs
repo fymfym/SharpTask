@@ -10,9 +10,9 @@ namespace SharpTaskExecuterConsole
     {
         static void Main(string[] args)
         {
-            var Param = new SharpTaskExecuter.SharpTaskExecuterParameter();
-            Param.TaskLibrary = @"C:\src\SharpTaskExecuter\SharpTaskExecuterConsole\bin\Debug";
-            new SharpTaskExecuter.SharpTaskExecuter().Run(Param);
+
+            var Param = SharpTaskExecuter.SharpTaskExecuterParameter.ParseArgs(args);
+            new SharpTaskExecuter.SharpTaskExecuter().Start(Param);
         }
     }
 }

@@ -9,14 +9,18 @@ namespace SharTaskTest.SharpTaskExecuterTest
 {
 
     [TestFixture]
-    public class WeekdayTriggerTest
+    public class RepeatDailyTriggerTest
     {
  
         SharpTaskTask.TaskTriggerInterface GetTriggerTime()
         {
-            var wdl = new List<DayOfWeek>();
-            wdl.Add(DayOfWeek.Monday);
-            return new SharpTaskTask.WeekdayTrigger(new SharpTaskTask.Date(2017,1,1), new SharpTaskTask.Time(12,0,0), wdl);
+            var dtr = new List<DayOfWeek>();
+            dtr.Add(DayOfWeek.Monday);
+            dtr.Add(DayOfWeek.Friday);
+            var ttr = new List<SharpTaskTask.Time>();
+            ttr.Add(new SharpTaskTask.Time(12, 0, 0));
+            ttr.Add(new SharpTaskTask.Time(15, 0, 0));
+            return new SharpTaskTask.RepeatDailyTrigger(new SharpTaskTask.Date(2017, 1, 1), dtr, ttr);
         }
 
         [Test]
@@ -44,14 +48,6 @@ namespace SharTaskTest.SharpTaskExecuterTest
         }
 
         [Test]
-        public void SameDayTwoBeforeTime()
-        {
-            var dt = new DateTime(2017, 1, 2, 11, 59, 59); // Monday
-            var wd = GetTriggerTime();
-            Assert.IsFalse(wd.ShouldRunNow(dt));
-        }
-
-        [Test]
         public void SameDayAfterTime()
         {
             var dt = new DateTime(2017, 1, 2, 12, 0, 10); // Monday
@@ -63,6 +59,14 @@ namespace SharTaskTest.SharpTaskExecuterTest
         public void SameDayJustBeforeEndTime()
         {
             var dt = new DateTime(2017, 1, 2, 12, 0, 5); // Monday
+            var wd = GetTriggerTime();
+            Assert.IsTrue(wd.ShouldRunNow(dt));
+        }
+
+        [Test]
+        public void SecondDayOf()
+        {
+            var dt = new DateTime(2017, 1, 6, 12, 0, 2); // Friday
             var wd = GetTriggerTime();
             Assert.IsTrue(wd.ShouldRunNow(dt));
         }

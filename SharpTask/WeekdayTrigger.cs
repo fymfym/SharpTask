@@ -9,76 +9,43 @@ namespace SharpTaskTask
     public class WeekdayTrigger : TaskTriggerInterface
     {
 
-        DateTime _triggerDateTime;
+        Date _triggerDate;
+        Time _triggerTime;
         List<DayOfWeek> _weekdayList;
 
-        public WeekdayTrigger(DateTime TriggerTime, List<DayOfWeek> WeekdayList)
+        /// <summary>
+        /// Starts from StartDateTime date and every at marked weekday at StartDateTime time
+        /// </summary>
+        public WeekdayTrigger()
+        {
+
+        }
+
+        public WeekdayTrigger(Date Startdate, Time ExecuteTime, List<DayOfWeek> WeekdayList)
         {
             _weekdayList = WeekdayList;
-            _triggerDateTime = TriggerTime;
+            _triggerDate = Startdate;
+            _triggerTime = ExecuteTime;
         }
-
-        public string Description
-        {
-            get
-            {
-                return "Starts from StartDateTime date and every at marked weekday at StartDateTime time";
-            }
-        }
-
-        public string Name
-        {
-            get
-            {
-                return "Executes at weekdays";
-            }
-        }
-
 
         public int Sequence { get; set; }
 
-        public DateTime StartDateTime { get; set; }
+        public Date StartDate { get; set; }
 
-        string TaskTriggerInterface.Name
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
+        string TaskTriggerInterface.Name { get; set; }
 
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
+        string TaskTriggerInterface.Description { get; set; }
 
-        string TaskTriggerInterface.Description
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        DateTime GetTimeOnly(DateTime DateTime)
-        {
-            return new DateTime(1, 1, 1, DateTime.Hour, DateTime.Minute, DateTime.Second);
-        }
 
         public bool ShouldRunNow(DateTime CurrentTime)
         {
-            var ts = new TimeSpan(CurrentTime.Ticks - _triggerDateTime.Ticks).TotalSeconds;
+            var ts = new TimeSpan(Helpers.GetTimeOnly(CurrentTime).Ticks - _triggerTime.Ticks).TotalSeconds;
 
             var day = CurrentTime.DayOfWeek;
             if (ts < 0) return false;
             if (_weekdayList.Count(x => x == day) < 1) return false;
 
-            ts = new TimeSpan(GetTimeOnly(CurrentTime).Ticks - GetTimeOnly(_triggerDateTime).Ticks).TotalSeconds;
+            ts = new TimeSpan(Helpers.GetTimeOnly(CurrentTime).Ticks - _triggerTime.Ticks).TotalSeconds;
 
             if ((ts >= 0) && (ts <= 5)) return true;
 

@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace SharTaskTest.SharpTaskExecuterTest
 {
     [TestFixture]
-    public class SharpTaskExecuterEnquedTask
+    public class SharpTaskExecuterEnquedTaskTest
     {
         
         [Test]

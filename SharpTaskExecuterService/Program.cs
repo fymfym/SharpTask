@@ -17,7 +17,7 @@ namespace SharpTaskExecuterService
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]
             {
-                new Service1()
+                new SharpTaskService()
             };
             ServiceBase.Run(ServicesToRun);
         }

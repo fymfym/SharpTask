@@ -14,7 +14,7 @@ namespace SharTaskTest.SharpTaskExecuterTest.TestHelpers
             get
             {
                 var res = new List<TaskTriggerInterface>();
-                res.Add(new SharpTaskTask.OneTimeTrigger(new DateTime(2017, 1, 1, 12, 00, 00)));
+                res.Add(new SharpTaskTask.OneTimeTrigger(new Date(2017, 1, 1), new Time(12, 00, 00)));
                 return res;
             }
         }

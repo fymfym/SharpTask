@@ -14,8 +14,8 @@ namespace SharpTaskSampleTask
             get
             {
                 var res = new List<SharpTaskTask.TaskTriggerInterface>();
-                res.Add(new OneTimeTrigger(DateTime.Now.AddSeconds(1)) { Name = "+01 sec" });
-                res.Add(new OneTimeTrigger(DateTime.Now.AddSeconds(10)) { Name = "+10 sec" });
+                res.Add(new OneTimeTrigger(new Date(DateTime.Now), new Time(DateTime.Now.AddSeconds(1))) { Name = "+01 sec" });
+                res.Add(new OneTimeTrigger(new Date(DateTime.Now), new Time(DateTime.Now.AddSeconds(10))) { Name = "+10 sec" });
                 return res;
             }
         }

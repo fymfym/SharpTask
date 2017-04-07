@@ -12,12 +12,19 @@ namespace SharpTaskExecuter
 
         Dictionary<Guid, EnquedTask> _enquedTasks;
         SharpTaskExecuterParameter _parameter;
+        bool _running;
 
-        public void Run(SharpTaskExecuterParameter Parameter)
+        public void Start(SharpTaskExecuterParameter Parameter)
         {
             _parameter = Parameter;
+            _running = true;
             UpdateEnquedTasks();
             ExecuteEnqueuedTasks();
+        }
+
+        public void Stop()
+        {
+            _running = false;
         }
 
         void WriteLog(string Message)
