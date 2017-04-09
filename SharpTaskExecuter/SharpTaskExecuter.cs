@@ -12,10 +12,34 @@ namespace SharpTaskExecuter
 
         Dictionary<Guid, EnquedTask> _enquedTasks;
         SharpTaskExecuterParameter _parameter;
+        LoggerInterface _logger;
         bool _running;
+
+        public static LoggerInterface GetLogger(SharpTaskExecuterParameter Parameters)
+        {
+            if (Parameters == null) throw new Exception("Parameters can not be null");
+
+            Assembly assembly = Assembly.Load(Parameters.LoggerAssembly);
+            if (assembly == null) throw new Exception("Assembly name in 'LoggerAssembly' not valid");
+
+            var x = assembly.GetTypes().Count(t => t.Name.ToLower() == Parameters.LoggerClass.ToLower());
+            if (x == 0) throw new Exception("Assembly name in 'LoggerClass' not valid");
+
+            var loggerType = assembly.GetTypes().First(t => t.Name.ToLower() == Parameters.LoggerClass.ToLower());
+
+            return (LoggerInterface)Activator.CreateInstance(loggerType);
+
+        }
+
+        public SharpTaskExecuter(LoggerInterface Logger)
+        {
+            if (Logger == null) throw new Exception("Logger must be implemented");
+            _logger = Logger;
+        }
 
         public void Start(SharpTaskExecuterParameter Parameter)
         {
+            _logger.Info("Starting SharpTaskExecuter");
             _parameter = Parameter;
             _running = true;
             UpdateEnquedTasks();
@@ -26,22 +50,12 @@ namespace SharpTaskExecuter
         {
             _running = false;
         }
-
-        void WriteLog(string Message)
-        {
-            Console.WriteLine(string.Format("{0} {1}", DateTime.Now.ToString("HH:mm:ss.fff"), Message));
-        }
-
-        void WriteLog(string Message, params string[] Messages)
-        {
-            WriteLog(string.Format(Message, Messages));
-        }
         
         public void ExecuteEnqueuedTasks()
         {
-            while (true)
+            while (_running)
             {
-                WriteLog("Checking enqued tasks...");
+                _logger.Info("Checking enqued tasks...");
                 foreach(var task in _enquedTasks)
                 {
                     var now = DateTime.Now;
@@ -59,7 +73,7 @@ namespace SharpTaskExecuter
         void _runTask(object TaskToRunObject)
         {
             EnquedTask TaskToRun = (EnquedTask)TaskToRunObject;
-            WriteLog("Starting taks: {0}", TaskToRun.Task.GetType().ToString());
+            _logger.Info("Starting taks: {0}", TaskToRun.Task.GetType().ToString());
 
             var result = TaskToRun.Task.RunTask(TaskToRun.Parameters);
             if (result.TaskFinished)
@@ -67,18 +81,19 @@ namespace SharpTaskExecuter
                 if (result.Sucessfull)
                 {
                     TaskToRun.MarkAsFinishedOk(DateTime.Now);
-                    WriteLog("Finished OK: {0}", TaskToRun.Task.GetType().ToString());
+                    _logger.Info("Finished OK: {0}", TaskToRun.Task.GetType().ToString());
                 }
                 else
                 {
                     TaskToRun.MarkAsFinishedError(DateTime.Now);
-                    WriteLog("Finished with error: {0}", TaskToRun.Task.GetType().ToString());
+                    _logger.Error("Finished with error: {0}", TaskToRun.Task.GetType().ToString());
                 }
             }
         }
 
         void UpdateEnquedTasks()
         {
+            _logger.Info("Loading tasks");
             if (_enquedTasks == null) _enquedTasks = new Dictionary<Guid, EnquedTask>();
             var type = typeof(SharpTaskTask.SharpTaskInterface);
 
@@ -93,6 +108,7 @@ namespace SharpTaskExecuter
                     var dllFileList = System.IO.Directory.GetFiles(path,"*.dll");
                     foreach (var file in dllFileList)
                     {
+                        _logger.Warning("Loading from assebly file: {0}", file);
                         var DLL = Assembly.LoadFile(file);
 
                         foreach (Type dlltype in DLL.GetExportedTypes())
@@ -103,12 +119,17 @@ namespace SharpTaskExecuter
                             if (ilist.Count(z => z.Name.ToLower().Contains("sharptaskinterface")) < 1) continue;
                             var sh = (SharpTaskTask.SharpTaskInterface)Activator.CreateInstance(dlltype);
                             EnquedTask et = new EnquedTask(sh);
-                            if (!_enquedTasks.ContainsKey(x.GUID)) _enquedTasks.Add(x.GUID, et);
+                            if (!_enquedTasks.ContainsKey(x.GUID))
+                            {
+                                _enquedTasks.Add(x.GUID, et);
+                                _logger.Info("  Tasks: {0} / {1}", x.GUID.ToString(), x.Name);
+                            }
                         }
                     }
                 }
                 else
                 {
+                    _logger.Warning("Assembly directory can not be found: {0}", path);
                 }
             }
             catch (Exception ex)

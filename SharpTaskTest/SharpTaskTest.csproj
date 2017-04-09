@@ -47,6 +47,7 @@
     <Compile Include="SharpTaskExecuterTest\SharpTaskExecuterEnquedRepeatDailyTest.cs" />
     <Compile Include="SharpTaskExecuterTest\SharpTaskExecuterEnquedTaskWeeklyTest.cs" />
     <Compile Include="SharpTaskExecuterTest\SharpTaskExecuterEnquedTaskOnTimeTest.cs" />
+    <Compile Include="SharpTaskExecuterTest\SharpTaskExecuterFindLoggerTest.cs" />
     <Compile Include="SharpTaskExecuterTest\TestHelpers\TaskREpeatDailyTriggerMoFr1215.cs" />
     <Compile Include="SharpTaskExecuterTest\TestHelpers\TaskWeeklyTriggerMonday.cs" />
     <Compile Include="SharpTaskExecuterTest\TestHelpers\TaskOneTimeTrigger201701011200.cs" />

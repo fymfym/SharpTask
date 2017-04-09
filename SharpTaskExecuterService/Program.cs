@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ServiceProcess;
 
 namespace SharpTaskExecuterService
 {
@@ -19,6 +14,7 @@ namespace SharpTaskExecuterService
             {
                 new SharpTaskService()
             };
+
             ServiceBase.Run(ServicesToRun);
         }
     }

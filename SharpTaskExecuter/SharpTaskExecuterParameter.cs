@@ -9,21 +9,34 @@ namespace SharpTaskExecuter
     public class SharpTaskExecuterParameter
     {
         public string TaskLibrary;
+        public string LoggerAssembly;
+        public string LoggerClass;
+
+        public SharpTaskExecuterParameter()
+        {
+            LoggerAssembly = "SharpTaskExecuter";
+            LoggerClass = "LoggerConsole";
+            TaskLibrary = ".";
+        }
+
+        static string GetParameterValue(List<string> KeyValueList, string Name, string DefaultVaue)
+        {
+            var idx = KeyValueList.IndexOf(Name);
+            if (idx >= 0)
+                if (KeyValueList.Count() >= idx + 1)
+                    return KeyValueList[idx + 1];
+            return DefaultVaue;
+        }
 
         public static SharpTaskExecuterParameter ParseArgs(string[] args)
         {
             var Param = new SharpTaskExecuterParameter();
             List<string> lst = args.ToList();
 
-            var idx = lst.IndexOf("tasklibrary");
-            if (idx < 0)
-            {
-                Param.TaskLibrary = @"C:\src\SharpTaskExecuter\SharpTaskExecuterConsole\bin\Debug";
-            }
-            else
-            {
-                Param.TaskLibrary = args[idx+1];
-            }
+            Param.TaskLibrary = GetParameterValue(lst, "tasklibrary", @"C:\src\SharpTaskExecuter\SharpTaskExecuterConsole\bin\Debug");
+            Param.LoggerAssembly = GetParameterValue(lst, "loggerassembly", "SharpTaskExecuter");
+            Param.LoggerClass = GetParameterValue(lst, "loggerclass", "LoggerConsole");
+            
 
             return Param;
         }
