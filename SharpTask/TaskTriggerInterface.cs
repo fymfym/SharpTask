@@ -8,7 +8,8 @@ namespace SharpTaskTask
 {
     public interface TaskTriggerInterface
     {
-        Date StartDate { get; set; }
+        Date TriggerDate { get; set; }
+        Time TriggerTime { get; set; }
         string Name { get; set; }
         string Description { get; set; }
         int Sequence { get; set; }

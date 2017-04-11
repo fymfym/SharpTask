@@ -14,7 +14,7 @@ namespace SharpTaskTask
 
         public Time()
         {
-
+            throw new Exception("");
         }
         public Time(int Hour, int Minute, int Second)
         {
@@ -49,6 +49,20 @@ namespace SharpTaskTask
         }
 
         public int Minute
+{
+            get
+            {
+                return _minute;
+            }
+            set
+            {
+                if (value < 0) throw new ArgumentOutOfRangeException("Minute must be between 0 and 23");
+                if (value > 59) throw new ArgumentOutOfRangeException("Minute  must be between 0 and 59");
+                _minute = value;
+            }
+        }
+
+        public int Second
         {
             get
             {
@@ -57,22 +71,8 @@ namespace SharpTaskTask
             set
             {
                 if (value < 0) throw new ArgumentOutOfRangeException("Second must be between 0 and 23");
-                if (value > 39) throw new ArgumentOutOfRangeException("Second must be between 0 and 59");
+                if (value > 59) throw new ArgumentOutOfRangeException("Second must be between 0 and 59");
                 _second = value;
-            }
-        }
-
-        public int Second
-        {
-            get
-            {
-                return _minute;
-            }
-            set
-            {
-                if (value < 0) throw new ArgumentOutOfRangeException("Minute must be between 0 and 23");
-                if (value > 39) throw new ArgumentOutOfRangeException("Minute  must be between 0 and 59");
-                _minute = value;
             }
         }
 

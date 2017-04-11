@@ -1,87 +1,96 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using log4net;
 
-namespace SharpTaskExecuter
+namespace LoggerLog4Net
 {
-    public class LoggerLog4Net : LoggerInterface
+    public class LoggerLog4Net : SharpTaskExecuter.LoggerInterface
     {
+
+        public LoggerLog4Net()
+        {
+            log4net.Config.BasicConfigurator.Configure();
+            System.IO.FileInfo configfile = new System.IO.FileInfo("log4net.xml");
+            if (configfile.Exists) log4net.Config.XmlConfigurator.Configure(configfile);
+        }
+
+        private static readonly ILog log = LogManager.GetLogger(typeof(LoggerLog4Net));
 
         public void Debug(string Message)
         {
-            throw new NotImplementedException();
+            log.Debug(Message);
         }
 
         public void Debug(string Message, Exception exception)
         {
-            throw new NotImplementedException();
+            log.Debug(Message,exception);
         }
 
         public void Debug(string Message, params string[] Parameters)
         {
-            throw new NotImplementedException();
+            log.DebugFormat(Message, Parameters);
         }
 
         public void Error(string Message)
         {
-            throw new NotImplementedException();
+            log.Error(Message);
         }
 
         public void Error(string Message, Exception exception)
         {
-            throw new NotImplementedException();
+            log.Error(Message,exception);
         }
 
         public void Error(string Message, params string[] Parameters)
         {
-            throw new NotImplementedException();
+            log.ErrorFormat(Message, Parameters);
+
         }
 
         public void Fatal(string Message)
         {
-            throw new NotImplementedException();
+            log.Fatal(Message);
         }
 
         public void Fatal(string Message, Exception exception)
         {
-            throw new NotImplementedException();
+            log.Fatal(Message,exception);
         }
 
         public void Fatal(string Message, params string[] Parameters)
         {
-            throw new NotImplementedException();
+            log.FatalFormat(Message, Parameters);
+
         }
 
         public void Info(string Message)
         {
-            throw new NotImplementedException();
+            log.Info(Message);
         }
 
         public void Info(string Message, Exception exception)
         {
-            throw new NotImplementedException();
+            log.Info(Message,exception);
         }
 
         public void Info(string Message, params string[] Parameters)
         {
-            throw new NotImplementedException();
+            log.InfoFormat(Message, Parameters);
+
         }
 
         public void Warning(string Message)
         {
-            throw new NotImplementedException();
+            log.Warn(Message);
         }
 
         public void Warning(string Message, Exception exception)
         {
-            throw new NotImplementedException();
+            log.Warn(Message,exception);
         }
 
         public void Warning(string Message, params string[] Parameters)
         {
-            throw new NotImplementedException();
+            log.WarnFormat(Message, Parameters);
         }
     }
 }

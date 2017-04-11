@@ -14,6 +14,7 @@ namespace SharpTaskTask
 
         List<DayOfWeek> _daysTorun;
         Date _triggerDate;
+        Time _triggerTime;
         List<Time> _startTimeList;
 
         public int Sequence
@@ -54,7 +55,29 @@ namespace SharpTaskTask
             }
         }
 
-        public Date StartDate { get; set; }
+        public Date TriggerDate
+        {
+            get
+            {
+                return _triggerDate;
+            }
+            set
+            {
+                _triggerDate = value;
+            }
+        }
+
+        public Time TriggerTime
+        {
+            get
+            {
+                return _triggerTime;
+            }
+            set
+            {
+                _triggerTime = value;
+            }
+        }
 
         public RepeatDailyTrigger(Date StartDate, List<DayOfWeek> DaysTorun, List<Time> StartTimeList)
         {

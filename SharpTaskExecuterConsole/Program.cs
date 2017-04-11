@@ -13,7 +13,11 @@ namespace SharpTaskExecuterConsole
         {
             var Param = SharpTaskExecuter.SharpTaskExecuterParameter.ParseArgs(args);
 
-            var logger = SharpTaskExecuter.SharpTaskExecuter.GetLogger(Param);
+            //var logger = SharpTaskExecuter.SharpTaskExecuter.GetLogger(Param);
+            //var logger = new LoggerLog4Net.LoggerLog4Net();
+
+            var logger = new SharpTaskExecuter.LoggerConsole();
+
             logger.Info("Logger'{0}' instantiated", logger.GetType().ToString());
 
             var _executer = new SharpTaskExecuter.SharpTaskExecuter(logger);

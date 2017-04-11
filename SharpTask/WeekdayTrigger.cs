@@ -30,7 +30,30 @@ namespace SharpTaskTask
 
         public int Sequence { get; set; }
 
-        public Date StartDate { get; set; }
+        public Date TriggerDate
+        {
+            get
+            {
+                return _triggerDate;
+            }
+            set
+            {
+                _triggerDate = value;
+            }
+        }
+
+        public Time TriggerTime
+        {
+            get
+            {
+                return _triggerTime;
+            }
+            set
+            {
+                _triggerTime = value;
+            }
+        }
+
 
         string TaskTriggerInterface.Name { get; set; }
 

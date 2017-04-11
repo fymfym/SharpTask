@@ -33,7 +33,7 @@ namespace SharpTaskExecuter
             var Param = new SharpTaskExecuterParameter();
             List<string> lst = args.ToList();
 
-            Param.TaskLibrary = GetParameterValue(lst, "tasklibrary", @"C:\src\SharpTaskExecuter\SharpTaskExecuterConsole\bin\Debug");
+            Param.TaskLibrary = GetParameterValue(lst, "tasklibrary", @".");
             Param.LoggerAssembly = GetParameterValue(lst, "loggerassembly", "SharpTaskExecuter");
             Param.LoggerClass = GetParameterValue(lst, "loggerclass", "LoggerConsole");
             

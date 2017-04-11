@@ -53,14 +53,15 @@ namespace SharpTaskExecuter
         
         public void ExecuteEnqueuedTasks()
         {
+            _logger.Info("Enqued tasks starting...");
             while (_running)
             {
-                _logger.Info("Checking enqued tasks...");
                 foreach(var task in _enquedTasks)
                 {
                     var now = DateTime.Now;
                     if (task.Value.ShouldExecuteNow(now))
                     {
+                        _logger.Info("Marking task {0} as stared", task.Value.ToString());
                         task.Value.MarkAsStarted(now);
                         System.Threading.Thread runTask = new System.Threading.Thread(new System.Threading.ParameterizedThreadStart(_runTask));
                         runTask.Start(task.Value);
@@ -68,6 +69,7 @@ namespace SharpTaskExecuter
                 }
                 System.Threading.Thread.Sleep(1000);
             }
+            _logger.Info("Enqued tasks stopped!");
         }
 
         void _runTask(object TaskToRunObject)
@@ -93,11 +95,10 @@ namespace SharpTaskExecuter
 
         void UpdateEnquedTasks()
         {
-            _logger.Info("Loading tasks");
+            _logger.Info("Loading tasks...");
             if (_enquedTasks == null) _enquedTasks = new Dictionary<Guid, EnquedTask>();
             var type = typeof(SharpTaskTask.SharpTaskInterface);
 
-            //Loading DLL files and their types
             try
             {
                 if (!System.IO.Directory.Exists(_parameter.TaskLibrary)) System.IO.Directory.CreateDirectory(_parameter.TaskLibrary);
@@ -105,10 +106,11 @@ namespace SharpTaskExecuter
                 var path = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), _parameter.TaskLibrary);
                 if (System.IO.Directory.Exists(path))
                 {
+                    _logger.Info("Loading task .dll files from: {0}", path);
                     var dllFileList = System.IO.Directory.GetFiles(path,"*.dll");
                     foreach (var file in dllFileList)
                     {
-                        _logger.Warning("Loading from assebly file: {0}", file);
+                        _logger.Info("Investigating file: {0}", System.IO.Path.GetFileName(file));
                         var DLL = Assembly.LoadFile(file);
 
                         foreach (Type dlltype in DLL.GetExportedTypes())
@@ -122,18 +124,23 @@ namespace SharpTaskExecuter
                             if (!_enquedTasks.ContainsKey(x.GUID))
                             {
                                 _enquedTasks.Add(x.GUID, et);
-                                _logger.Info("  Tasks: {0} / {1}", x.GUID.ToString(), x.Name);
+                                _logger.Info("  Task added: {0} / {1}", x.GUID.ToString(), x.Name);
+                                foreach (var tt in sh.RunTrigger)
+                                {
+                                    _logger.Info("    Trigger: {0} / {1} {2}", tt.Name, tt.TriggerDate.ToString(), tt.TriggerTime.ToString());
+                                }
                             }
                         }
                     }
                 }
                 else
                 {
-                    _logger.Warning("Assembly directory can not be found: {0}", path);
+                    _logger.Warning("Task .dll directory can not be found: {0}", path);
                 }
             }
             catch (Exception ex)
             {
+                _logger.Warning("Could not load task .DLL files", ex);
                 throw new Exception("Could not load task .DLL files", ex);
             }
 

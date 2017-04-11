@@ -50,6 +50,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\LoggerLog4Net\LoggerLog4Net.csproj">
+      <Project>{ae9c58da-0e04-45f3-93c0-ce0c22497350}</Project>
+      <Name>LoggerLog4Net</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SharpTaskExecuter\SharpTaskExecuter.csproj">
       <Project>{f50c02be-65ae-474c-928f-2171fbb1d3dc}</Project>
       <Name>SharpTaskExecuter</Name>

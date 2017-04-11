@@ -8,10 +8,10 @@ namespace SharpTaskExecuter
 {
     public class LoggerConsole : LoggerInterface
     {
-        enum LogLevel { Debug, Information, Warning, Error, Fatal }
+        enum LogLevel { Debug, Info, Warn, Error, Fatal }
         void Write(LogLevel Level, string Message)
         {
-            Console.WriteLine(string.Format("{0} {1} {2}", DateTime.Now.ToString("HH:mm:ss.fff"), Level, Message));
+            Console.WriteLine(string.Format("{0} [{1}] {2}", DateTime.Now.ToString("HH:mm:ss.fff"), Level, Message));
         }
 
         public void Debug(string Message)
@@ -64,34 +64,34 @@ namespace SharpTaskExecuter
 
         public void Info(string Message)
         {
-            Write(LogLevel.Information, Message);
+            Write(LogLevel.Info, Message);
         }
 
         public void Info(string Message, Exception exception)
         {
-            Write(LogLevel.Information, Message);
-            Write(LogLevel.Information, exception.ToString());
+            Write(LogLevel.Info, Message);
+            Write(LogLevel.Info, exception.ToString());
         }
 
         public void Info(string Message, params string[] Parameters)
         {
-            Write(LogLevel.Information, string.Format(Message, Parameters));
+            Write(LogLevel.Info, string.Format(Message, Parameters));
         }
 
         public void Warning(string Message)
         {
-            Write(LogLevel.Warning, Message);
+            Write(LogLevel.Warn, Message);
         }
 
         public void Warning(string Message, Exception exception)
         {
-            Write(LogLevel.Warning, Message);
-            Write(LogLevel.Warning, exception.ToString());
+            Write(LogLevel.Warn, Message);
+            Write(LogLevel.Warn, exception.ToString());
         }
 
         public void Warning(string Message, params string[] Parameters)
         {
-            Write(LogLevel.Warning, string.Format(Message, Parameters));
+            Write(LogLevel.Warn, string.Format(Message, Parameters));
         }
     }
 }

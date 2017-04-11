@@ -44,7 +44,6 @@
     <Compile Include="LoggerInterface.cs" />
     <Compile Include="LoggerConsole.cs" />
     <Compile Include="LoggerNull.cs" />
-    <Compile Include="LoggerLog4Net.cs" />
     <Compile Include="SharpTaskExecuter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SharpTaskExecuterParameter.cs" />

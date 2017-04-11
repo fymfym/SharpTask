@@ -9,14 +9,21 @@ namespace SharpTaskSampleTask
 {
     public class SharpTaskSampleTask : SharpTaskTask.SharpTaskInterface
     {
+        List<SharpTaskTask.TaskTriggerInterface> _triggerList;
+
+        private void CreateTriggerList()
+        {
+            var now = DateTime.Now.AddSeconds(5);
+            _triggerList = new List<TaskTriggerInterface>();
+            _triggerList.Add(new OneTimeTrigger(new Date(now), new Time(now)) { Name = "+05 sec" });
+        }
+
         public List<SharpTaskTask.TaskTriggerInterface> RunTrigger
         {
             get
             {
-                var res = new List<SharpTaskTask.TaskTriggerInterface>();
-                res.Add(new OneTimeTrigger(new Date(DateTime.Now), new Time(DateTime.Now.AddSeconds(1))) { Name = "+01 sec" });
-                res.Add(new OneTimeTrigger(new Date(DateTime.Now), new Time(DateTime.Now.AddSeconds(10))) { Name = "+10 sec" });
-                return res;
+                if (_triggerList == null) CreateTriggerList();
+                return _triggerList;
             }
         }
 
