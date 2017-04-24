@@ -9,21 +9,45 @@ namespace SharpTaskSampleTask
 {
     public class SharpTaskSampleTask : SharpTaskTask.SharpTaskInterface
     {
-        List<SharpTaskTask.TaskTriggerInterface> _triggerList;
+        List<SharpTaskTask.TriggerInterface> _triggerList;
 
         private void CreateTriggerList()
         {
             var now = DateTime.Now.AddSeconds(5);
-            _triggerList = new List<TaskTriggerInterface>();
-            _triggerList.Add(new OneTimeTrigger(new Date(now), new Time(now)) { Name = "+05 sec" });
+            _triggerList = new List<TriggerInterface>();
+            _triggerList.Add(new TriggerOneTime(new Date(now), new Time(now)) { Name = "+05 sec" });
         }
 
-        public List<SharpTaskTask.TaskTriggerInterface> RunTrigger
+        public List<SharpTaskTask.TriggerInterface> RunTrigger
         {
             get
             {
                 if (_triggerList == null) CreateTriggerList();
                 return _triggerList;
+            }
+        }
+
+        public string Name
+        {
+            get
+            {
+                return "Sample task";
+            }
+        }
+
+        public string Description
+        {
+            get
+            {
+                return "Sample task description";
+            }
+        }
+
+        public string Owner
+        {
+            get
+            {
+                return "Sample task owner";
             }
         }
 

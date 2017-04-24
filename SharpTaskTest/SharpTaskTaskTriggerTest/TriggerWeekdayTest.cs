@@ -5,18 +5,18 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 
-namespace SharTaskTest.SharpTaskExecuterTest
+namespace SharTaskTest.SharpTaskTaskTriggerTest
 {
 
     [TestFixture]
-    public class WeekdayTriggerTest
+    public class TriggerWeekdayTest
     {
  
-        SharpTaskTask.TaskTriggerInterface GetTriggerTime()
+        SharpTaskTask.TriggerInterface GetTriggerTime()
         {
             var wdl = new List<DayOfWeek>();
             wdl.Add(DayOfWeek.Monday);
-            return new SharpTaskTask.WeekdayTrigger(new SharpTaskTask.Date(2017,1,1), new SharpTaskTask.Time(12,0,0), wdl);
+            return new SharpTaskTask.TriggerWeekday(new SharpTaskTask.Date(2017,1,1), new SharpTaskTask.Time(12,0,0), wdl);
         }
 
         [Test]

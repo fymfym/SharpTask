@@ -47,17 +47,19 @@
     <Compile Include="SharpTaskExecuterTest\SharpTaskExecuterEnquedRepeatDailyTest.cs" />
     <Compile Include="SharpTaskExecuterTest\SharpTaskExecuterEnquedTaskWeeklyTest.cs" />
     <Compile Include="SharpTaskExecuterTest\SharpTaskExecuterEnquedTaskOnTimeTest.cs" />
-    <Compile Include="SharpTaskExecuterTest\SharpTaskExecuterFindLoggerTest.cs" />
-    <Compile Include="SharpTaskExecuterTest\TestHelpers\TaskREpeatDailyTriggerMoFr1215.cs" />
+    <Compile Include="SharpTaskExecuterTest\TestHelpers\TaskRepeatDailyTriggerMo10SecApart.cs" />
+    <Compile Include="SharpTaskExecuterTest\TestHelpers\TaskRepeatDailyTriggerMoFr1215.cs" />
+    <Compile Include="SharpTaskExecuterTest\TestHelpers\TaskRepeatHourly.cs" />
     <Compile Include="SharpTaskExecuterTest\TestHelpers\TaskWeeklyTriggerMonday.cs" />
     <Compile Include="SharpTaskExecuterTest\TestHelpers\TaskOneTimeTrigger201701011200.cs" />
     <Compile Include="SharpTaskExecuterTest\TestHelpers\TemporaryTask.cs" />
-    <Compile Include="SharpTaskTaskTest\TimeTest.cs" />
-    <Compile Include="SharpTaskTaskTest\DateTest.cs" />
-    <Compile Include="SharpTaskTaskTest\RepeatDailyTriggerTest.cs" />
-    <Compile Include="SharpTaskTaskTest\WeekdayTriggerTest.cs" />
-    <Compile Include="SharpTaskTaskTest\OneTimeTriggerTest.cs" />
-    <Compile Include="SharpTaskTaskTest\SharkTaskTaskRunResultTest.cs" />
+    <Compile Include="Misc\TimeTest.cs" />
+    <Compile Include="Misc\DateTest.cs" />
+    <Compile Include="SharpTaskTaskTriggerTest\TriggerRepeatEveryHourTest.cs" />
+    <Compile Include="SharpTaskTaskTriggerTest\TriggerRepeatDailyTest.cs" />
+    <Compile Include="SharpTaskTaskTriggerTest\TriggerWeekdayTest.cs" />
+    <Compile Include="SharpTaskTaskTriggerTest\TriggerOneTimeTest.cs" />
+    <Compile Include="Misc\SharkTaskTaskRunResultTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SharpTaskExecuterTest\SharpTaskExecuterEnquedTaskTest.cs" />
   </ItemGroup>

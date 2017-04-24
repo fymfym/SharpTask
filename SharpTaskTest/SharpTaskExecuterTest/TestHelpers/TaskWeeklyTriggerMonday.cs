@@ -9,14 +9,38 @@ namespace SharTaskTest.SharpTaskExecuterTest.TestHelpers
 {
     public class TaskWeeklyTriggerMonday : SharpTaskTask.SharpTaskInterface
     {
-        public List<TaskTriggerInterface> RunTrigger
+        public string Description
         {
             get
             {
-                var res = new List<TaskTriggerInterface>();
+                return "SharTaskTest.SharpTaskExecuterTest.TestHelpers";
+            }
+        }
+
+        public string Name
+        {
+            get
+            {
+                return "SharTaskTest.SharpTaskExecuterTest.TestHelpers";
+            }
+        }
+
+        public string Owner
+        {
+            get
+            {
+                return "SharTaskTest.SharpTaskExecuterTest.TestHelpers";
+            }
+        }
+
+        public List<TriggerInterface> RunTrigger
+        {
+            get
+            {
+                var res = new List<TriggerInterface>();
                 var wdl = new List<DayOfWeek>();
                 wdl.Add(DayOfWeek.Monday);
-                res.Add(new SharpTaskTask.WeekdayTrigger(new Date(2017, 1, 1), new Time(12, 00, 00),wdl));
+                res.Add(new SharpTaskTask.TriggerWeekday(new Date(2017, 1, 1), new Time(12, 00, 00),wdl));
                 return res;
             }
         }

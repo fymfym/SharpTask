@@ -15,8 +15,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpTaskSampleTask", "Shar
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpTaskTest", "SharpTaskTest\SharpTaskTest.csproj", "{AE70C604-0114-4C2F-8714-99B623EEE2FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoggerLog4Net", "LoggerLog4Net\LoggerLog4Net.csproj", "{AE9C58DA-0E04-45F3-93C0-CE0C22497350}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,10 +45,6 @@ Global
 		{AE70C604-0114-4C2F-8714-99B623EEE2FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE70C604-0114-4C2F-8714-99B623EEE2FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE70C604-0114-4C2F-8714-99B623EEE2FE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AE9C58DA-0E04-45F3-93C0-CE0C22497350}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AE9C58DA-0E04-45F3-93C0-CE0C22497350}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AE9C58DA-0E04-45F3-93C0-CE0C22497350}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AE9C58DA-0E04-45F3-93C0-CE0C22497350}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

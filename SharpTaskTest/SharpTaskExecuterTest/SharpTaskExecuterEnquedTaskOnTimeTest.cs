@@ -16,7 +16,7 @@ namespace SharTaskTest.SharpTaskExecuterTest
             var dt = new DateTime(2017, 1, 1, 12, 00, 00);
             var t = new TestHelpers.TaskWeeklyTriggerMonday();
             var et = new SharpTaskExecuter.EnquedTask(t);
-            Assert.IsFalse(et.ShouldExecuteNow(dt));
+            Assert.IsFalse(et.ShouldExecuteNow(dt).ShouldExecuteNow);
         }
 
         [Test]
@@ -25,9 +25,9 @@ namespace SharTaskTest.SharpTaskExecuterTest
             var dt = new DateTime(2017, 1, 2, 12, 00, 00);
             var t = new TestHelpers.TaskWeeklyTriggerMonday();
             var et = new SharpTaskExecuter.EnquedTask(t);
-            Assert.IsTrue(et.ShouldExecuteNow(dt));
+            Assert.IsTrue(et.ShouldExecuteNow(dt).ShouldExecuteNow);
             et.MarkAsFinishedOk(dt);
-            Assert.IsFalse(et.ShouldExecuteNow(dt));
+            Assert.IsFalse(et.ShouldExecuteNow(dt).ShouldExecuteNow);
         }
 
         [Test]
@@ -36,7 +36,7 @@ namespace SharTaskTest.SharpTaskExecuterTest
             var dt = new DateTime(2017, 1, 2, 12, 00, 01);
             var t = new TestHelpers.TaskWeeklyTriggerMonday();
             var et = new SharpTaskExecuter.EnquedTask(t);
-            Assert.IsTrue(et.ShouldExecuteNow(dt));
+            Assert.IsTrue(et.ShouldExecuteNow(dt).ShouldExecuteNow);
         }
 
         [Test]
@@ -45,7 +45,7 @@ namespace SharTaskTest.SharpTaskExecuterTest
             var dt = new DateTime(2017, 1, 2, 12, 00, 06);
             var t = new TestHelpers.TaskWeeklyTriggerMonday();
             var et = new SharpTaskExecuter.EnquedTask(t);
-            Assert.IsFalse(et.ShouldExecuteNow(dt));
+            Assert.IsFalse(et.ShouldExecuteNow(dt).ShouldExecuteNow);
         }
 
         [Test]
@@ -54,7 +54,7 @@ namespace SharTaskTest.SharpTaskExecuterTest
             var dt = new DateTime(2017, 1, 1, 11, 00, 00);
             var t = new TestHelpers.TaskWeeklyTriggerMonday();
             var et = new SharpTaskExecuter.EnquedTask(t);
-            Assert.IsFalse(et.ShouldExecuteNow(dt));
+            Assert.IsFalse(et.ShouldExecuteNow(dt).ShouldExecuteNow);
         }
 
 
@@ -64,7 +64,7 @@ namespace SharTaskTest.SharpTaskExecuterTest
             var dt = new DateTime(2017, 1, 1, 13, 00, 00);
             var t = new TestHelpers.TaskWeeklyTriggerMonday();
             var et = new SharpTaskExecuter.EnquedTask(t);
-            Assert.IsFalse(et.ShouldExecuteNow(dt));
+            Assert.IsFalse(et.ShouldExecuteNow(dt).ShouldExecuteNow);
         }
     }
 }

@@ -11,70 +11,29 @@ namespace SharTaskTest.SharpTaskExecuterTest
     public class SharpTaskExecuterEnquedRepeatDailyTest
     {
         [Test]
-        public void TestShouldExecuteTooEraly()
+        public void TaskRepeatHourly01Test()
         {
-            var dt = new DateTime(2017, 1, 1, 12, 00, 00);
-            var t = new TestHelpers.TaskREpeatDailyTriggerMoFr1215();
+            var t = new TestHelpers.TaskRepeatHourly01();
             var et = new SharpTaskExecuter.EnquedTask(t);
-            Assert.IsFalse(et.ShouldExecuteNow(dt));
-        }
 
-        [Test]
-        public void TestShouldExecuteNowTwoTimesOnTime()
-        {
-            var dt = new DateTime(2017, 1, 2, 12, 00, 00);
-            var t = new TestHelpers.TaskREpeatDailyTriggerMoFr1215();
-            var et = new SharpTaskExecuter.EnquedTask(t);
-            Assert.IsTrue(et.ShouldExecuteNow(dt));
+            var dt = new DateTime(2017, 1, 1, 0, 0, 0);
+            Assert.IsFalse(et.ShouldExecuteNow(dt).ShouldExecuteNow);
+
+            dt = new DateTime(2017, 1, 1, 0, 1, 0);
+            Assert.IsTrue(et.ShouldExecuteNow(dt).ShouldExecuteNow);
+            et.MarkAsStarted(dt);
+            Assert.IsFalse(et.ShouldExecuteNow(dt).ShouldExecuteNow);
+
+            dt = new DateTime(2017, 1, 1, 0, 1, 4);
+            Assert.IsFalse(et.ShouldExecuteNow(dt).ShouldExecuteNow);
+
             et.MarkAsFinishedOk(dt);
-            Assert.IsFalse(et.ShouldExecuteNow(dt));
-        }
+            Assert.IsFalse(et.ShouldExecuteNow(dt).ShouldExecuteNow);
 
-        [Test]
-        public void TestShouldExecuteFirstTimeOneSecondOver()
-        {
-            var dt = new DateTime(2017, 1, 2, 12, 00, 01);
-            var t = new TestHelpers.TaskREpeatDailyTriggerMoFr1215();
-            var et = new SharpTaskExecuter.EnquedTask(t);
-            Assert.IsTrue(et.ShouldExecuteNow(dt));
-        }
-
-        [Test]
-        public void TestShouldExecuteFirsTimeSixSecondOver()
-        {
-            var dt = new DateTime(2017, 1, 2, 12, 00, 06);
-            var t = new TestHelpers.TaskREpeatDailyTriggerMoFr1215();
-            var et = new SharpTaskExecuter.EnquedTask(t);
-            Assert.IsFalse(et.ShouldExecuteNow(dt));
-        }
-
-        [Test]
-        public void TestShouldExecuteBeforeTime()
-        {
-            var dt = new DateTime(2017, 1, 1, 11, 00, 00);
-            var t = new TestHelpers.TaskREpeatDailyTriggerMoFr1215();
-            var et = new SharpTaskExecuter.EnquedTask(t);
-            Assert.IsFalse(et.ShouldExecuteNow(dt));
-        }
-
-        [Test]
-        public void TestShouldExecuteAfter1HTime()
-        {
-            var dt = new DateTime(2017, 1, 2, 13, 00, 00);
-            var t = new TestHelpers.TaskREpeatDailyTriggerMoFr1215();
-            var et = new SharpTaskExecuter.EnquedTask(t);
-            Assert.IsFalse(et.ShouldExecuteNow(dt));
-        }
-
-        [Test]
-        public void TestShouldExecuteTwoInARow()
-        {
-            var dt = new DateTime(2017, 1, 2, 12, 00, 00);
-            var t = new TestHelpers.TaskREpeatDailyTriggerMoFr1215();
-            var et = new SharpTaskExecuter.EnquedTask(t);
-            Assert.IsTrue(et.ShouldExecuteNow(dt));
             et.MarkAsFinishedOk(dt);
-            Assert.IsFalse(et.ShouldExecuteNow(dt));
+            dt = new DateTime(2017, 1, 1, 2, 1, 2);
+            Assert.IsTrue(et.ShouldExecuteNow(dt).ShouldExecuteNow);
         }
+
     }
 }

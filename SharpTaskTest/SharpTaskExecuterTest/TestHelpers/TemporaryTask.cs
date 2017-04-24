@@ -9,11 +9,35 @@ namespace SharTaskTest.SharpTaskExecuterTest.TestHelpers
 {
     public class TemporaryTask : SharpTaskTask.SharpTaskInterface
     {
-        public List<TaskTriggerInterface> RunTrigger
+        public string Description
         {
             get
             {
-                var res = new List<TaskTriggerInterface>();
+                return "SharTaskTest.SharpTaskExecuterTest.TestHelpers";
+            }
+        }
+
+        public string Name
+        {
+            get
+            {
+                return "SharTaskTest.SharpTaskExecuterTest.TestHelpers";
+            }
+        }
+
+        public string Owner
+        {
+            get
+            {
+                return "SharTaskTest.SharpTaskExecuterTest.TestHelpers";
+            }
+        }
+
+        public List<TriggerInterface> RunTrigger
+        {
+            get
+            {
+                var res = new List<TriggerInterface>();
                 return res;
             }
         }

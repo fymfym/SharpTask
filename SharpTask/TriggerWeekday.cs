@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SharpTaskTask
 {
-    public class WeekdayTrigger : TaskTriggerInterface
+    public class TriggerWeekday : TriggerInterface
     {
 
         Date _triggerDate;
@@ -16,12 +16,12 @@ namespace SharpTaskTask
         /// <summary>
         /// Starts from StartDateTime date and every at marked weekday at StartDateTime time
         /// </summary>
-        public WeekdayTrigger()
+        public TriggerWeekday()
         {
 
         }
 
-        public WeekdayTrigger(Date Startdate, Time ExecuteTime, List<DayOfWeek> WeekdayList)
+        public TriggerWeekday(Date Startdate, Time ExecuteTime, List<DayOfWeek> WeekdayList)
         {
             _weekdayList = WeekdayList;
             _triggerDate = Startdate;
@@ -55,9 +55,9 @@ namespace SharpTaskTask
         }
 
 
-        string TaskTriggerInterface.Name { get; set; }
+        string TriggerInterface.Name { get; set; }
 
-        string TaskTriggerInterface.Description { get; set; }
+        string TriggerInterface.Description { get; set; }
 
 
         public bool ShouldRunNow(DateTime CurrentTime)

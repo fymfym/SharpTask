@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SharpTaskTask
 {
-    public interface TaskTriggerInterface
+    public interface TriggerInterface
     {
         Date TriggerDate { get; set; }
         Time TriggerTime { get; set; }

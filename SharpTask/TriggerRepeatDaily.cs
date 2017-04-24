@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace SharpTaskTask
 {
-    public class RepeatDailyTrigger : TaskTriggerInterface
+    public class TriggerRepeatDaily : TriggerInterface
     {
+
         string _name;
         string _description;
         int _sequence;
@@ -15,7 +16,7 @@ namespace SharpTaskTask
         List<DayOfWeek> _daysTorun;
         Date _triggerDate;
         Time _triggerTime;
-        List<Time> _startTimeList;
+        Time _startTime;
 
         public int Sequence
         {
@@ -79,24 +80,22 @@ namespace SharpTaskTask
             }
         }
 
-        public RepeatDailyTrigger(Date StartDate, List<DayOfWeek> DaysTorun, List<Time> StartTimeList)
+        public TriggerRepeatDaily(Date StartDate, List<DayOfWeek> DaysTorun, Time StartTime)
         {
             _daysTorun = DaysTorun;
             _triggerDate = StartDate;
-            _startTimeList = StartTimeList;
+            _startTime = StartTime;
         }
 
         public bool ShouldRunNow(DateTime CurrentTime)
         {
+
             var day = CurrentTime.DayOfWeek;
             if (_daysTorun.Count(x => x == day) < 1) return false;
 
+            var ts = new TimeSpan(Helpers.GetTimeOnly(CurrentTime).Ticks - _startTime.Ticks).TotalSeconds;
+            if ((ts >= 0) && (ts <= 5)) return true;
 
-            foreach (var t in _startTimeList)
-            {
-                var ts = new TimeSpan(Helpers.GetTimeOnly(CurrentTime).Ticks - t.Ticks).TotalSeconds;
-                if ((ts >= 0) && (ts <= 5)) return true;
-            }
             return false;
         }
     }

@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using log4net;
 
 namespace SharpTaskExecuter
 {
     public class EnquedTask
     {
+        private static readonly ILog log = LogManager.GetLogger(typeof(EnquedTask));
+
         const int StartTimeSlipAllowed = 5;
         object LockObject = new object();
 
@@ -20,6 +23,7 @@ namespace SharpTaskExecuter
         DateTime _lastExecuteStart;
         DateTime _lastExecuteFinished;
         SharpTaskTask.SharpTaskInterface _task;
+        Dictionary<long,DateTime> _pastExecutions;
 
         public eExecuteState ExecutingState
         {
@@ -41,6 +45,7 @@ namespace SharpTaskExecuter
         {
             if (Task == null) throw new Exception("Taks not set correct");
             _task = Task;
+            _pastExecutions = new Dictionary<long, DateTime>();
         }
 
         public SharpTaskTask.SharpTaskInterface Task
@@ -64,6 +69,7 @@ namespace SharpTaskExecuter
         {
             lock (LockObject)
             {
+                _lastExecuteStart = DateTime.MinValue;
                 _lastExecuteFinished = CurrentTime;
                 _executionResult = eExecutionResult.Ok;
                 _executionState = eExecuteState.Done;
@@ -81,21 +87,32 @@ namespace SharpTaskExecuter
             }
         }
 
-        public bool ShouldExecuteNow(DateTime CurrentTime)
+        public ShouldExecuteResult ShouldExecuteNow(DateTime CurrentTime)
         {
-            foreach(var tt in _task.RunTrigger)
+            ShouldExecuteResult res = new ShouldExecuteResult();
+            foreach (var tt in _task.RunTrigger)
             {
-                if (_lastExecuteFinished > DateTime.MinValue)
-                {
-                    var ts = new TimeSpan(_lastExecuteFinished.Ticks - CurrentTime.Ticks).TotalSeconds;
-                    if (ts <= 0) return false;
-                }
                 if (tt.ShouldRunNow(CurrentTime))
                 {
-                    return true;
+                    bool run = true;
+                    if ((_lastExecuteFinished > DateTime.MinValue) || (_lastExecuteStart > DateTime.MinValue))
+                    {
+                        var ts = new TimeSpan(_lastExecuteFinished.Ticks - CurrentTime.Ticks).TotalSeconds;
+                        if (ts <= 0) run = false;
+                        ts = new TimeSpan(_lastExecuteStart.Ticks - CurrentTime.Ticks).TotalSeconds;
+                        if (ts <= 0) run = false;
+                    }
+
+                    if (run)
+                    {
+                        _pastExecutions.Add(tt.GetHashCode(), CurrentTime);
+                        res.ShouldExecuteNow = true;
+                        res.UsedTrigger = tt;
+                        return res;
+                    }
                 }
             }
-            return false;
+            return res;
         }
     }
 }

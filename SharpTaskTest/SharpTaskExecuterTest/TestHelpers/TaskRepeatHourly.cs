@@ -7,13 +7,13 @@ using SharpTaskTask;
 
 namespace SharTaskTest.SharpTaskExecuterTest.TestHelpers
 {
-    public class TaskRepeatDailyTriggerMoFr1215 : SharpTaskTask.SharpTaskInterface
+    public class TaskRepeatHourly01 : SharpTaskTask.SharpTaskInterface
     {
         public string Description
         {
             get
             {
-                return "SharTaskTest.SharpTaskExecuterTest.TestHelpers";
+                return "TaskRepeatHourly";
             }
         }
 
@@ -21,7 +21,7 @@ namespace SharTaskTest.SharpTaskExecuterTest.TestHelpers
         {
             get
             {
-                return "SharTaskTest.SharpTaskExecuterTest.TestHelpers";
+                return "TaskRepeatHourly";
             }
         }
 
@@ -29,7 +29,7 @@ namespace SharTaskTest.SharpTaskExecuterTest.TestHelpers
         {
             get
             {
-                return "SharTaskTest.SharpTaskExecuterTest.TestHelpers";
+                return "TaskRepeatHourly";
             }
         }
 
@@ -38,11 +38,7 @@ namespace SharTaskTest.SharpTaskExecuterTest.TestHelpers
             get
             {
                 var res = new List<TriggerInterface>();
-                var dtr = new List<DayOfWeek>();
-                dtr.Add(DayOfWeek.Monday);
-                dtr.Add(DayOfWeek.Friday);
-                res.Add(new SharpTaskTask.TriggerRepeatDaily(new Date(2017, 1, 1), dtr, new Time(12, 0, 0)));
-                res.Add(new SharpTaskTask.TriggerRepeatDaily(new Date(2017, 1, 1), dtr, new Time(15, 0, 0)));
+                res.Add(new SharpTaskTask.TriggerRepeatEveryHour(new Date(2017, 1, 1), 1));
                 return res;
             }
         }
