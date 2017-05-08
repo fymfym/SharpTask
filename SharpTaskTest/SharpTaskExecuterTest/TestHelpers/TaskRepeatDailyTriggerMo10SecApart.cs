@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SharpTaskTask;
+using SharpTask;
 
 namespace SharTaskTest.SharpTaskExecuterTest.TestHelpers
 {
-    public class TaskRepeatDailyTriggerMo10SecApart : SharpTaskTask.SharpTaskInterface
+    public class TaskRepeatDailyTriggerMo10SecApart : SharpTask.ISharpTaskInterface
     {
         public string Description
         {
@@ -41,7 +41,7 @@ namespace SharTaskTest.SharpTaskExecuterTest.TestHelpers
                 var dtr = new List<DayOfWeek>();
                 dtr.Add(DayOfWeek.Sunday);
 
-                res.Add(new SharpTaskTask.TriggerRepeatDaily(new Date(2017, 1, 1), dtr, new Time(0,0,0)));
+                res.Add(new SharpTask.TriggerRepeatDaily(new Date(2017, 1, 1), dtr, new Time(0,0,0)));
                 return res;
             }
         }

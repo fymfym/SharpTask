@@ -45,9 +45,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SharpTask\SharpTaskTask.csproj">
+    <ProjectReference Include="..\SharpTask\SharpTask.csproj">
       <Project>{f4bee0c7-a248-4730-a04e-f453318b2666}</Project>
-      <Name>SharpTaskTask</Name>
+      <Name>SharpTask</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

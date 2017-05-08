@@ -15,6 +15,8 @@ namespace SharpTaskExecuter
         Dictionary<Guid, EnquedTask> _enquedTasks;
         SharpTaskExecuterParameter _parameter;
         bool _running;
+        DateTime _lastDllLoad;
+        Dictionary<string, DLLLoadState> _dllLoadedList;
 
         public SharpTaskExecuter(SharpTaskExecuterParameter Parameters)
         {
@@ -25,6 +27,7 @@ namespace SharpTaskExecuter
         {
             log.Info("Starting SharpTaskExecuter");
             _running = true;
+            _dllLoadedList = new Dictionary<string, DLLLoadState>();
             UpdateEnquedTasks();
             ExecuteEnqueuedTasks();
         }
@@ -33,26 +36,32 @@ namespace SharpTaskExecuter
         {
             _running = false;
         }
-        
+
         public void ExecuteEnqueuedTasks()
         {
             log.Info("Waiting for enqued tasks start trigger...");
             while (_running)
             {
-                foreach(var task in _enquedTasks)
+                foreach (var task in _enquedTasks)
                 {
                     var now = DateTime.Now;
                     var res = task.Value.ShouldExecuteNow(now);
                     if (res.ShouldExecuteNow)
                     {
                         log.InfoFormat("Marking task {0} as stared", task.Value.ToString());
-                        log.InfoFormat(" - using triger {0}", (res.UsedTrigger.Name != null) ? res.UsedTrigger.Name : "Unnamed");
+                        log.InfoFormat(" - using triger {0}", res.UsedTrigger.Name ?? "Unnamed");
                         task.Value.MarkAsStarted(now);
                         System.Threading.Thread runTask = new System.Threading.Thread(new System.Threading.ParameterizedThreadStart(_runTask));
                         runTask.Start(task.Value);
                     }
                 }
                 System.Threading.Thread.Sleep(1000);
+
+
+                if (new TimeSpan(DateTime.Now.Ticks - _lastDllLoad.Ticks).TotalSeconds > 30)
+                {
+                    UpdateEnquedTasks();
+                }
             }
             log.Info("Enqued tasks stopped!");
         }
@@ -82,7 +91,13 @@ namespace SharpTaskExecuter
         {
             log.Info("Loading tasks...");
             if (_enquedTasks == null) _enquedTasks = new Dictionary<Guid, EnquedTask>();
-            var type = typeof(SharpTaskTask.SharpTaskInterface);
+            var type = typeof(SharpTask.ISharpTaskInterface);
+
+            TypeInfo LoadedTaskType = null;
+            DLLLoadState dllLoadState = null;
+
+            foreach (var item in _dllLoadedList)
+                item.Value.FilePresenceConfirmed = false;
 
             try
             {
@@ -91,31 +106,55 @@ namespace SharpTaskExecuter
                 var path = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), _parameter.TaskLibrary);
                 if (System.IO.Directory.Exists(path))
                 {
-                    log.InfoFormat("Loading task .dll files from: {0}", path);
-                    var dllFileList = System.IO.Directory.GetFiles(path,"*.dll");
+                    log.InfoFormat("Task .dll directoryu: {0}", path);
+                    var dllFileList = System.IO.Directory.GetFiles(path, "*.dll");
+
                     foreach (var file in dllFileList)
                     {
                         log.InfoFormat("Investigating file: {0}", System.IO.Path.GetFileName(file));
+
+                        if (!_dllLoadedList.ContainsKey(file))
+                        {
+                            dllLoadState = new DLLLoadState()
+                            {
+                                DLLName = file,
+                                DLLFileName = file,
+                                FilePresenceConfirmed = true
+                            };
+                        }
+                        else
+                        {
+                            dllLoadState = _dllLoadedList[file];
+                            dllLoadState.FilePresenceConfirmed = true;
+                        }
+
+                        var res = _dllLoadedList.Count(x => (x.Value.DLLName == file) && (x.Value.LoadError));
+                        if (res > 0) continue;
+
                         var DLL = Assembly.LoadFile(file);
 
                         foreach (Type dlltype in DLL.GetExportedTypes())
                         {
-                            TypeInfo x = dlltype.GetTypeInfo();
-                            var ilist = x.ImplementedInterfaces;
+                            LoadedTaskType = dlltype.GetTypeInfo();
+
+                            var ilist = LoadedTaskType.ImplementedInterfaces;
 
                             if (ilist.Count(z => z.Name.ToLower().Contains("sharptaskinterface")) < 1) continue;
-                            var sh = (SharpTaskTask.SharpTaskInterface)Activator.CreateInstance(dlltype);
+
+                            var sh = (SharpTask.ISharpTaskInterface)Activator.CreateInstance(dlltype);
+
                             EnquedTask et = new EnquedTask(sh);
-                            if (!_enquedTasks.ContainsKey(x.GUID))
+                            if (!_enquedTasks.ContainsKey(LoadedTaskType.GUID))
                             {
-                                _enquedTasks.Add(x.GUID, et);
-                                log.InfoFormat("  Task added: {0} / {1}", x.GUID.ToString(), x.Name);
+                                _enquedTasks.Add(LoadedTaskType.GUID, et);
+                                log.InfoFormat("  Task added: {0} / {1}", LoadedTaskType.GUID.ToString(), LoadedTaskType.GetType().ToString());
                                 foreach (var tt in sh.RunTrigger)
                                 {
-                                    var name = (tt.Name != null) ? tt.Name : "Unnamed";
+                                    var name = tt.Name ?? "Unnamed";
                                     var vtd = tt.TriggerDate.ToString();
                                     var vtt = (tt.TriggerTime != null) ? tt.TriggerTime.ToString() : "";
-                                    log.InfoFormat("    Trigger: {0} / {1} {2}", name, vtd,  vtt);
+                                    log.DebugFormat("    Trigger: {0} / {1} {2}", name, vtd, vtt);
+                                    dllLoadState.ConfirmedLoaded = true;
                                 }
                             }
                         }
@@ -125,11 +164,41 @@ namespace SharpTaskExecuter
                 {
                     log.WarnFormat("Task .dll directory can not be found: {0}", path);
                 }
+
+                _lastDllLoad = DateTime.Now;
+
             }
             catch (Exception ex)
             {
-                log.Warn("Could not load task .DLL files", ex);
-                throw new Exception("Could not load task .DLL files", ex);
+                dllLoadState.LoadError = true;
+                if (!_dllLoadedList.ContainsKey(dllLoadState.DLLName))
+                {
+                    _dllLoadedList.Add(dllLoadState.DLLName, dllLoadState);
+                }
+                log.WarnFormat("Could not load task .DLL file: {0}", dllLoadState.DLLFileName);
+                log.Warn("Loading .DLL failes",ex);
+            }
+
+            log.InfoFormat("Task loaded: ");
+            foreach (var item in _dllLoadedList.Where(x => !x.Value.ConfirmedLoaded && !x.Value.ReportedToGui))
+            {
+                log.InfoFormat("  {0}", item.Value.DLLName);
+                item.Value.ReportedToGui = true;
+            }
+
+            log.InfoFormat("Task unloaded:");
+            foreach (var item in _dllLoadedList.Where(x => !x.Value.LoadError && !x.Value.ReportedToGui))
+            {
+                log.InfoFormat("  {0}", item.Value.DLLName);
+                item.Value.ReportedToGui = true;
+            }
+
+            log.InfoFormat("DLL files removed:");
+            var filelist = _dllLoadedList.Where(x => !x.Value.FilePresenceConfirmed).ToList();
+            foreach(var item in filelist)
+            {
+                _dllLoadedList.Remove(item.Value.DLLName);
+                log.InfoFormat("  {0}", item.Value.DLLName);
             }
 
         }

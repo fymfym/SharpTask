@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SharpTaskTask;
+using SharpTask;
 
 namespace SharTaskTest.SharpTaskExecuterTest.TestHelpers
 {
-    public class TaskRepeatHourly01 : SharpTaskTask.SharpTaskInterface
+    public class TaskRepeatHourly01 : SharpTask.ISharpTaskInterface
     {
         public string Description
         {
@@ -37,8 +37,10 @@ namespace SharTaskTest.SharpTaskExecuterTest.TestHelpers
         {
             get
             {
-                var res = new List<TriggerInterface>();
-                res.Add(new SharpTaskTask.TriggerRepeatEveryHour(new Date(2017, 1, 1), 1));
+                var res = new List<TriggerInterface>
+                {
+                    new SharpTask.TriggerRepeatEveryHour(new Date(2017, 1, 1), 1)
+                };
                 return res;
             }
         }

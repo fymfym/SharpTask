@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SharpTaskTask
+namespace SharpTask
 {
-    public interface SharpTaskInterface
+    public interface ISharpTaskInterface
     {
         RunResult RunTask(TaskParameters taskParameters);
-        List<SharpTaskTask.TriggerInterface> RunTrigger { get; }
+        List<SharpTask.TriggerInterface> RunTrigger { get; }
         string Name { get; }
         string Description { get; }
         string Owner { get; }

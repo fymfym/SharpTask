@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SharpTaskTask;
+using SharpTask;
 
 namespace SharTaskTest.SharpTaskExecuterTest.TestHelpers
 {
-    public class TemporaryTask : SharpTaskTask.SharpTaskInterface
+    public class TemporaryTask : SharpTask.ISharpTaskInterface
     {
         public string Description
         {

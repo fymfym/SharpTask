@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpTaskTask", "SharpTask\SharpTaskTask.csproj", "{F4BEE0C7-A248-4730-A04E-F453318B2666}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpTask", "SharpTask\SharpTask.csproj", "{F4BEE0C7-A248-4730-A04E-F453318B2666}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpTaskExecuterConsole", "SharpTaskExecuterConsole\SharpTaskExecuterConsole.csproj", "{A946B889-B4D0-4716-9C98-3F0C801AAE58}"
 EndProject

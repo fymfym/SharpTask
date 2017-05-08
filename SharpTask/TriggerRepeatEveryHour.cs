@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SharpTaskTask
+namespace SharpTask
 {
     public class TriggerRepeatEveryHour : TriggerInterface
     {
@@ -91,7 +91,7 @@ namespace SharpTaskTask
             var ts = new TimeSpan(Helpers.GetTimeOnly(CurrentTime).Ticks - new Time(CurrentTime.Hour,_repeatMinute,0).Ticks).TotalSeconds;
             if ((ts >= 0) && (ts <= 5))
             {
-                _triggerTime = new SharpTaskTask.Time(CurrentTime);
+                _triggerTime = new SharpTask.Time(CurrentTime);
                 return true;
             }
             return false;

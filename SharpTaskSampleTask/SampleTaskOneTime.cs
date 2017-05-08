@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SharpTaskTask;
+using SharpTask;
 
 namespace SharpTaskSampleTask
 {
-    public class SharpTaskSampleTask : SharpTaskTask.SharpTaskInterface
+    public class SharpTaskSampleTask : SharpTask.ISharpTaskInterface
     {
-        List<SharpTaskTask.TriggerInterface> _triggerList;
+        List<SharpTask.TriggerInterface> _triggerList;
 
         private void CreateTriggerList()
         {
@@ -18,7 +18,7 @@ namespace SharpTaskSampleTask
             _triggerList.Add(new TriggerOneTime(new Date(now), new Time(now)) { Name = "+05 sec" });
         }
 
-        public List<SharpTaskTask.TriggerInterface> RunTrigger
+        public List<SharpTask.TriggerInterface> RunTrigger
         {
             get
             {

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SharpTaskTask;
+using SharpTask;
 
 namespace SharTaskTest.SharpTaskExecuterTest.TestHelpers
 {
-    public class TaskOneTimeTrigger201701011200 : SharpTaskTask.SharpTaskInterface
+    public class TaskOneTimeTrigger201701011200 : SharpTask.ISharpTaskInterface
     {
         public string Description
         {
@@ -38,7 +38,7 @@ namespace SharTaskTest.SharpTaskExecuterTest.TestHelpers
             get
             {
                 var res = new List<TriggerInterface>();
-                res.Add(new SharpTaskTask.TriggerOneTime(new Date(2017, 1, 1), new Time(12, 00, 00)));
+                res.Add(new SharpTask.TriggerOneTime(new Date(2017, 1, 1), new Time(12, 00, 00)));
                 return res;
             }
         }

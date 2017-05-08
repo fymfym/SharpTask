@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SharpTaskTask;
+using SharpTask;
 
 namespace SharpTaskSampleTask
 {
-    public class SampleTaskDaily : SharpTaskTask.SharpTaskInterface
+    public class SampleTaskDaily : SharpTask.ISharpTaskInterface
     {
-        List<SharpTaskTask.TriggerInterface> _triggerList;
+        List<SharpTask.TriggerInterface> _triggerList;
 
         private void CreateTriggerList()
         {
             _triggerList = new List<TriggerInterface>();
-            var stl = new SharpTaskTask.Time(0,0,0);
+            var stl = new SharpTask.Time(0,0,0);
             int sec = 30;
 
             var dl = new List<DayOfWeek>();
@@ -22,15 +22,15 @@ namespace SharpTaskSampleTask
 
             for (int x = 0; x < 5; x++)
             {
-                stl = new SharpTaskTask.Time(0, 0, sec);
-                var rdt = new SharpTaskTask.TriggerRepeatDaily(new SharpTaskTask.Date(DateTime.Now.AddDays(-1)), dl, stl) { Name = "Every 30 sec trigger - 5 times " };
+                stl = new SharpTask.Time(0, 0, sec);
+                var rdt = new SharpTask.TriggerRepeatDaily(new SharpTask.Date(DateTime.Now.AddDays(-1)), dl, stl) { Name = "Every 30 sec trigger - 5 times " };
                 _triggerList.Add(rdt);
                 sec = sec + 30;
             }
 
         }
 
-        public List<SharpTaskTask.TriggerInterface> RunTrigger
+        public List<SharpTask.TriggerInterface> RunTrigger
         {
             get
             {

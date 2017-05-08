@@ -14,18 +14,18 @@ namespace SharpTaskExecuter
         const int StartTimeSlipAllowed = 5;
         object LockObject = new object();
 
-        public SharpTaskTask.TaskParameters Parameters;
-        public enum eExecutionResult { NotSet, Ok, Error };
-        public enum eExecuteState { WaitingForStartTrigger, InvestigatingTrigger, WaitingToStart, Executing, Done };
+        public SharpTask.TaskParameters Parameters;
+        public enum ExecutionResult { NotSet, Ok, Error };
+        public enum ExecuteState { WaitingForStartTrigger, InvestigatingTrigger, WaitingToStart, Executing, Done };
 
-        eExecuteState _executionState;
-        eExecutionResult _executionResult;
+        ExecuteState _executionState;
+        ExecutionResult _executionResult;
         DateTime _lastExecuteStart;
         DateTime _lastExecuteFinished;
-        SharpTaskTask.SharpTaskInterface _task;
+        SharpTask.ISharpTaskInterface _task;
         Dictionary<long,DateTime> _pastExecutions;
 
-        public eExecuteState ExecutingState
+        public ExecuteState ExecutingState
         {
             get
             {
@@ -33,7 +33,7 @@ namespace SharpTaskExecuter
             }
         }
 
-        public eExecutionResult LatestExecutionResult
+        public ExecutionResult LatestExecutionResult
         {
             get
             {
@@ -41,14 +41,14 @@ namespace SharpTaskExecuter
             }
         }
 
-        public EnquedTask(SharpTaskTask.SharpTaskInterface Task)
+        public EnquedTask(SharpTask.ISharpTaskInterface Task)
         {
-            if (Task == null) throw new Exception("Taks not set correct");
+            if (Task == null) throw new Exception("Task not set correct");
             _task = Task;
             _pastExecutions = new Dictionary<long, DateTime>();
         }
 
-        public SharpTaskTask.SharpTaskInterface Task
+        public SharpTask.ISharpTaskInterface Task
         {
             get
             {
@@ -61,7 +61,7 @@ namespace SharpTaskExecuter
             lock (LockObject)
             {
                 _lastExecuteStart = CurrentTime;
-                _executionState = eExecuteState.Executing;
+                _executionState = ExecuteState.Executing;
             }
         }
 
@@ -71,8 +71,8 @@ namespace SharpTaskExecuter
             {
                 _lastExecuteStart = DateTime.MinValue;
                 _lastExecuteFinished = CurrentTime;
-                _executionResult = eExecutionResult.Ok;
-                _executionState = eExecuteState.Done;
+                _executionResult = ExecutionResult.Ok;
+                _executionState = ExecuteState.Done;
             }
         }
 
@@ -82,8 +82,8 @@ namespace SharpTaskExecuter
             {
 
                 _lastExecuteFinished = CurrentTime;
-                _executionResult = eExecutionResult.Error;
-                _executionState = eExecuteState.Done;
+                _executionResult = ExecutionResult.Error;
+                _executionState = ExecuteState.Done;
             }
         }
 
@@ -98,9 +98,12 @@ namespace SharpTaskExecuter
                     if ((_lastExecuteFinished > DateTime.MinValue) || (_lastExecuteStart > DateTime.MinValue))
                     {
                         var ts = new TimeSpan(_lastExecuteFinished.Ticks - CurrentTime.Ticks).TotalSeconds;
-                        if (ts <= 0) run = false;
-                        ts = new TimeSpan(_lastExecuteStart.Ticks - CurrentTime.Ticks).TotalSeconds;
-                        if (ts <= 0) run = false;
+                        if ((ts <= 0) && (ts >= -120)) run = false;
+                        if (_lastExecuteStart.Ticks > 0)
+                        {
+                            ts = new TimeSpan(_lastExecuteStart.Ticks - CurrentTime.Ticks).TotalSeconds;
+                            if (ts <= 0) run = false;
+                        }
                     }
 
                     if (run)

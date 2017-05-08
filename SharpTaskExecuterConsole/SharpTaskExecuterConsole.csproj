@@ -59,10 +59,6 @@
       <Project>{f50c02be-65ae-474c-928f-2171fbb1d3dc}</Project>
       <Name>SharpTaskExecuter</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SharpTaskSampleTask\SharpTaskSampleTask.csproj">
-      <Project>{f14f97b8-eef7-4cc8-91af-d05de64744e1}</Project>
-      <Name>SharpTaskSampleTask</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="log4net.xml">

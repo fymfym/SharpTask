@@ -17,8 +17,8 @@ namespace SharTaskTest.SharpTaskExecuterTest
             var t = new TestHelpers.TemporaryTask();
             var et = new SharpTaskExecuter.EnquedTask(t);
             Assert.IsTrue(et.Task == t);
-            Assert.IsTrue(et.LatestExecutionResult == SharpTaskExecuter.EnquedTask.eExecutionResult.NotSet);
-            Assert.IsTrue(et.ExecutingState == SharpTaskExecuter.EnquedTask.eExecuteState.WaitingForStartTrigger);
+            Assert.IsTrue(et.LatestExecutionResult == SharpTaskExecuter.EnquedTask.ExecutionResult.NotSet);
+            Assert.IsTrue(et.ExecutingState == SharpTaskExecuter.EnquedTask.ExecuteState.WaitingForStartTrigger);
         }
 
         [Test]
@@ -27,7 +27,7 @@ namespace SharTaskTest.SharpTaskExecuterTest
             var t = new TestHelpers.TemporaryTask();
             var et = new SharpTaskExecuter.EnquedTask(t);
             et.MarkAsStarted(DateTime.MinValue);
-            Assert.IsTrue(et.ExecutingState == SharpTaskExecuter.EnquedTask.eExecuteState.Executing);
+            Assert.IsTrue(et.ExecutingState == SharpTaskExecuter.EnquedTask.ExecuteState.Executing);
         }
 
         [Test]
@@ -36,8 +36,8 @@ namespace SharTaskTest.SharpTaskExecuterTest
             var t = new TestHelpers.TemporaryTask();
             var et = new SharpTaskExecuter.EnquedTask(t);
             et.MarkAsFinishedOk(DateTime.MinValue);
-            Assert.IsTrue(et.ExecutingState == SharpTaskExecuter.EnquedTask.eExecuteState.Done);
-            Assert.IsTrue(et.LatestExecutionResult == SharpTaskExecuter.EnquedTask.eExecutionResult.Ok);
+            Assert.IsTrue(et.ExecutingState == SharpTaskExecuter.EnquedTask.ExecuteState.Done);
+            Assert.IsTrue(et.LatestExecutionResult == SharpTaskExecuter.EnquedTask.ExecutionResult.Ok);
         }
 
         [Test]
@@ -46,8 +46,8 @@ namespace SharTaskTest.SharpTaskExecuterTest
             var t = new TestHelpers.TemporaryTask();
             var et = new SharpTaskExecuter.EnquedTask(t);
             et.MarkAsFinishedError(DateTime.MinValue);
-            Assert.IsTrue(et.ExecutingState == SharpTaskExecuter.EnquedTask.eExecuteState.Done);
-            Assert.IsTrue(et.LatestExecutionResult == SharpTaskExecuter.EnquedTask.eExecutionResult.Error);
+            Assert.IsTrue(et.ExecutingState == SharpTaskExecuter.EnquedTask.ExecuteState.Done);
+            Assert.IsTrue(et.LatestExecutionResult == SharpTaskExecuter.EnquedTask.ExecutionResult.Error);
         }
 
         [Test]

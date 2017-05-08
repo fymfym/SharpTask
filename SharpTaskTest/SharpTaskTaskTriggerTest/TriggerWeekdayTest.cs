@@ -12,11 +12,11 @@ namespace SharTaskTest.SharpTaskTaskTriggerTest
     public class TriggerWeekdayTest
     {
  
-        SharpTaskTask.TriggerInterface GetTriggerTime()
+        SharpTask.TriggerInterface GetTriggerTime()
         {
             var wdl = new List<DayOfWeek>();
             wdl.Add(DayOfWeek.Monday);
-            return new SharpTaskTask.TriggerWeekday(new SharpTaskTask.Date(2017,1,1), new SharpTaskTask.Time(12,0,0), wdl);
+            return new SharpTask.TriggerWeekday(new SharpTask.Date(2017,1,1), new SharpTask.Time(12,0,0), wdl);
         }
 
         [Test]

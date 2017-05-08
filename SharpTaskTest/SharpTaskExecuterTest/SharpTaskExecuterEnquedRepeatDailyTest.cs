@@ -30,7 +30,6 @@ namespace SharTaskTest.SharpTaskExecuterTest
             et.MarkAsFinishedOk(dt);
             Assert.IsFalse(et.ShouldExecuteNow(dt).ShouldExecuteNow);
 
-            et.MarkAsFinishedOk(dt);
             dt = new DateTime(2017, 1, 1, 2, 1, 2);
             Assert.IsTrue(et.ShouldExecuteNow(dt).ShouldExecuteNow);
         }

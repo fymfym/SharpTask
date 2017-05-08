@@ -15,7 +15,7 @@ namespace SharTaskTest.SharpTaskTaskTriggerTest
         public void TestBeforeTime()
         {
             var dt = new DateTime(2017, 1, 1, 12, 0, 0);
-            var ott = new SharpTaskTask.TriggerOneTime(new SharpTaskTask.Date(dt), new SharpTaskTask.Time(dt));
+            var ott = new SharpTask.TriggerOneTime(new SharpTask.Date(dt), new SharpTask.Time(dt));
             Assert.IsFalse(ott.ShouldRunNow(dt.AddSeconds(-1)));
         }
 
@@ -23,7 +23,7 @@ namespace SharTaskTest.SharpTaskTaskTriggerTest
         public void TestAfterTimeOneSencond()
         {
             var dt = new DateTime(2017, 1, 1, 12, 0, 0);
-            var ott = new SharpTaskTask.TriggerOneTime(new SharpTaskTask.Date(dt), new SharpTaskTask.Time(dt));
+            var ott = new SharpTask.TriggerOneTime(new SharpTask.Date(dt), new SharpTask.Time(dt));
             Assert.IsTrue(ott.ShouldRunNow(dt.AddSeconds(1)));
         }
 
@@ -31,7 +31,7 @@ namespace SharTaskTest.SharpTaskTaskTriggerTest
         public void TestOnTime()
         {
             var dt = new DateTime(2017, 1, 1, 12, 0, 0);
-            var ott = new SharpTaskTask.TriggerOneTime(new SharpTaskTask.Date(dt), new SharpTaskTask.Time(dt));
+            var ott = new SharpTask.TriggerOneTime(new SharpTask.Date(dt), new SharpTask.Time(dt));
             Assert.IsTrue(ott.ShouldRunNow(dt));
         }
     }

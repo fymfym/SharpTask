@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using SharpTaskTask;
+using SharpTask;
 
 namespace SharTaskTest.SharpTaskExecuterTest
 {
@@ -13,20 +13,20 @@ namespace SharTaskTest.SharpTaskExecuterTest
     public class TriggerRepeatDailyTest
     {
  
-        SharpTaskTask.TriggerInterface GetTriggerHour()
+        SharpTask.TriggerInterface GetTriggerHour()
         {
             var dtr = new List<DayOfWeek>();
             dtr.Add(DayOfWeek.Monday);
             dtr.Add(DayOfWeek.Friday);
-            return new SharpTaskTask.TriggerRepeatDaily(new SharpTaskTask.Date(2017, 1, 1), dtr, new SharpTaskTask.Time(12,0,0));
+            return new SharpTask.TriggerRepeatDaily(new SharpTask.Date(2017, 1, 1), dtr, new SharpTask.Time(12,0,0));
         }
 
-        SharpTaskTask.TriggerInterface GetTriggerSeconds()
+        SharpTask.TriggerInterface GetTriggerSeconds()
         {
             var dtr = new List<DayOfWeek>();
             dtr.Add(DayOfWeek.Monday);
             dtr.Add(DayOfWeek.Friday);
-            return new SharpTaskTask.TriggerRepeatDaily(new SharpTaskTask.Date(2017, 1, 1), dtr, new Time(0,0,0) );
+            return new SharpTask.TriggerRepeatDaily(new SharpTask.Date(2017, 1, 1), dtr, new Time(0,0,0) );
         }
 
         [Test]
