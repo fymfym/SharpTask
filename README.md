@@ -1,5 +1,5 @@
 # SharpTask
-Yet another task scheduling system in c# for .net framwork 
+Yet another task scheduling system in c# for .net framwork (might do .NET Core)  
 
 This project is work in progress.
 
@@ -9,7 +9,7 @@ Intentions:
 - The tasks is scheduled by implmenting the interface TaskTrigger list
 - A number of working implementations of triggers supplied
 
-Use case:
+Use case in mind:
 - Download and install the .MSI
   - This installs the service and gives you a SharpTaskTask.dll to include in your own project
 - Make a VS Class librarey project, refference the the SharpTaskTask.dll
@@ -19,8 +19,3 @@ Use case:
 - Compile the project
 - Copy the .DLL file to the TaskLibrary of the service
 - The service picks it up and runs the tasks at "trigger timer"
-
-Outstanding issues:
-- Unload an already loaded .DLL file
-  - Copy to a runtime directory
-  - Monitor original directory for activity, unload .DLL on delete from directory
