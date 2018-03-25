@@ -1,37 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using SharpTask.Task;
 
 namespace SharTaskTest.SharpTaskExecuterTest.TestHelpers
 {
     public class TaskRepeatHourly01 : ISharpTask
     {
-        public string Description
-        {
-            get
-            {
-                return "TaskRepeatHourly";
-            }
-        }
+        public string Description => "TaskRepeatHourly";
 
-        public string Name
-        {
-            get
-            {
-                return "TaskRepeatHourly";
-            }
-        }
+        public string Name => "TaskRepeatHourly";
 
-        public string Owner
-        {
-            get
-            {
-                return "TaskRepeatHourly";
-            }
-        }
+        public string Owner => "TaskRepeatHourly";
 
         public List<ITriggerInterface> RunTrigger
         {
@@ -39,7 +17,7 @@ namespace SharTaskTest.SharpTaskExecuterTest.TestHelpers
             {
                 var res = new List<ITriggerInterface>
                 {
-                    new TriggerRepeatEveryHour(new STDate(2017, 1, 1), 1)
+                    new TriggerRepeatEveryHour(1)
                 };
                 return res;
             }

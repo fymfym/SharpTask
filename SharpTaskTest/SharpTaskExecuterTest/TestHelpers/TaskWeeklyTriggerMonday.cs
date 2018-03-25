@@ -1,37 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SharpTask.Task;
 
 namespace SharTaskTest.SharpTaskExecuterTest.TestHelpers
 {
     public class TaskWeeklyTriggerMonday : ISharpTask
     {
-        public string Description
-        {
-            get
-            {
-                return "SharTaskTest.SharpTaskExecuterTest.TestHelpers";
-            }
-        }
+        public string Description => "SharTaskTest.SharpTaskExecuterTest.TestHelpers";
 
-        public string Name
-        {
-            get
-            {
-                return "SharTaskTest.SharpTaskExecuterTest.TestHelpers";
-            }
-        }
+        public string Name => "SharTaskTest.SharpTaskExecuterTest.TestHelpers";
 
-        public string Owner
-        {
-            get
-            {
-                return "SharTaskTest.SharpTaskExecuterTest.TestHelpers";
-            }
-        }
+        public string Owner => "SharTaskTest.SharpTaskExecuterTest.TestHelpers";
 
         public List<ITriggerInterface> RunTrigger
         {
@@ -42,7 +21,7 @@ namespace SharTaskTest.SharpTaskExecuterTest.TestHelpers
                 {
                     DayOfWeek.Monday
                 };
-                res.Add(new TriggerWeekday(new STDate(2017, 1, 1), new STTime(12, 00, 00),wdl));
+                res.Add(new TriggerWeekday(new StDate(2017, 1, 1), new StTime(12, 00, 00),wdl));
                 return res;
             }
         }

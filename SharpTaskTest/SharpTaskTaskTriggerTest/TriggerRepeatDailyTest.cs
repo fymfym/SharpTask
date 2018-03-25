@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using SharpTask.Task;
 
-namespace SharTaskTest.SharpTaskExecuterTest
+namespace SharTaskTest.SharpTaskTaskTriggerTest
 {
 
     [TestFixture]
@@ -20,7 +17,7 @@ namespace SharTaskTest.SharpTaskExecuterTest
                 DayOfWeek.Monday,
                 DayOfWeek.Friday
             };
-            return new TriggerRepeatDaily(new STDate(2017, 1, 1), dtr, new STTime(12,0,0));
+            return new TriggerRepeatDaily(new StDate(2017, 1, 1), dtr, new StTime(12,0,0));
         }
 
         ITriggerInterface GetTriggerSeconds()
@@ -30,7 +27,7 @@ namespace SharTaskTest.SharpTaskExecuterTest
                 DayOfWeek.Monday,
                 DayOfWeek.Friday
             };
-            return new TriggerRepeatDaily(new STDate(2017, 1, 1), dtr, new STTime(0,0,0) );
+            return new TriggerRepeatDaily(new StDate(2017, 1, 1), dtr, new StTime(0,0,0) );
         }
 
         [Test]

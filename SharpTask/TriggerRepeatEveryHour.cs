@@ -1,98 +1,34 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SharpTask.Task;
 
 namespace SharpTask.Task
 {
     public class TriggerRepeatEveryHour : ITriggerInterface
     {
+        readonly int _repeatMinute;
 
-        string _name;
-        string _description;
-        int _sequence;
+        public int Sequence { get; set; }
 
-        STDate _triggerDate;
-        STTime _triggerTime;
-        int _repeatMinute;
+        public string Description { get; set; }
 
-        public int Sequence
+        public string Name { get; set; }
+
+        public StDate TriggerDate { get; set; }
+
+        public StTime TriggerTime { get; set; }
+
+        public TriggerRepeatEveryHour(int repeatMinute)
         {
-            get
-            {
-                return _sequence;
-            }
-
-            set
-            {
-                _sequence = value;
-            }
+            _repeatMinute = repeatMinute;
         }
 
-        public string Description
+        public bool ShouldRunNow(DateTime currentTime)
         {
-            get
-            {
-                return _description;
-            }
-            set
-            {
-                _description = value;
-            }
-        }
+            if (currentTime.Minute != _repeatMinute) return false;
 
-        public string Name
-        {
-            get
-            {
-                return _name;
-            }
-
-            set
-            {
-                _name = value;
-            }
-        }
-
-        public STDate TriggerDate
-        {
-            get
-            {
-                return _triggerDate;
-            }
-            set
-            {
-                _triggerDate = value;
-            }
-        }
-
-        public STTime TriggerTime
-        {
-            get
-            {
-                return _triggerTime;
-            }
-            set
-            {
-                _triggerTime = value;
-            }
-        }
-
-        public TriggerRepeatEveryHour(STDate StartDate, int RepeatMinute)
-        {
-            _repeatMinute = RepeatMinute;
-        }
-
-        public bool ShouldRunNow(DateTime CurrentTime)
-        {
-            if (CurrentTime.Minute != _repeatMinute) return false;
-
-            var ts = new TimeSpan(Helpers.GetTimeOnly(CurrentTime).Ticks - new STTime(CurrentTime.Hour,_repeatMinute,0).Ticks).TotalSeconds;
+            var ts = new TimeSpan(Helpers.GetTimeOnly(currentTime).Ticks - new StTime(currentTime.Hour,_repeatMinute,0).Ticks).TotalSeconds;
             if ((ts >= 0) && (ts <= 5))
             {
-                _triggerTime = new STTime(CurrentTime);
+                TriggerTime = new StTime(currentTime);
                 return true;
             }
             return false;

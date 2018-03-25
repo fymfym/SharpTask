@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SharpTask.Task
 {
     public static class Helpers
     {
-        public static DateTime GetTimeOnly(DateTime DateTime)
+        public static DateTime GetTimeOnly(DateTime dateTime)
         {
-            return new DateTime(1, 1, 1, DateTime.Hour, DateTime.Minute, DateTime.Second);
+            return new DateTime(1, 1, 1, dateTime.Hour, dateTime.Minute, dateTime.Second);
         }
 
     }

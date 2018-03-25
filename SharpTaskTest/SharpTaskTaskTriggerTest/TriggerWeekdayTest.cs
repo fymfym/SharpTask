@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using SharpTask.Task;
 
@@ -12,14 +9,13 @@ namespace SharTaskTest.SharpTaskTaskTriggerTest
     [TestFixture]
     public class TriggerWeekdayTest
     {
- 
-        ITriggerInterface GetTriggerTime()
+        private ITriggerInterface GetTriggerTime()
         {
             var wdl = new List<DayOfWeek>
             {
                 DayOfWeek.Monday
             };
-            return new TriggerWeekday(new STDate(2017,1,1), new STTime(12,0,0), wdl);
+            return new TriggerWeekday(new StDate(2017,1,1), new StTime(12,0,0), wdl);
         }
 
         [Test]

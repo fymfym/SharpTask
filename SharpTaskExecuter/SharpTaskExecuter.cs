@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using log4net;
 using SharpTask.Task;
 
@@ -11,24 +9,24 @@ namespace SharpTaskExecuter
 {
     public class SharpTaskExecuter
     {
-        private static readonly ILog log = LogManager.GetLogger(typeof(SharpTaskExecuter));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(SharpTaskExecuter));
 
         Dictionary<Guid, EnquedTask> _enquedTasks;
-        SharpTaskExecuterParameter _parameter;
+        readonly SharpTaskExecuterParameter _parameter;
         bool _running;
         DateTime _lastDllLoad;
-        Dictionary<string, DLLLoadState> _dllLoadedList;
+        Dictionary<string, DllLoadState> _dllLoadedList;
 
-        public SharpTaskExecuter(SharpTaskExecuterParameter Parameters)
+        public SharpTaskExecuter(SharpTaskExecuterParameter parameters)
         {
-            _parameter = Parameters;
+            _parameter = parameters;
         }
 
         public void Start()
         {
-            log.Info("Starting SharpTaskExecuter");
+            Log.Info("Starting SharpTaskExecuter");
             _running = true;
-            _dllLoadedList = new Dictionary<string, DLLLoadState>();
+            _dllLoadedList = new Dictionary<string, DllLoadState>();
             UpdateEnquedTasks();
             ExecuteEnqueuedTasks();
         }
@@ -40,7 +38,7 @@ namespace SharpTaskExecuter
 
         public void ExecuteEnqueuedTasks()
         {
-            log.Info("Waiting for enqued tasks start trigger...");
+            Log.Info("Waiting for enqued tasks start trigger...");
             while (_running)
             {
                 foreach (var task in _enquedTasks)
@@ -49,10 +47,10 @@ namespace SharpTaskExecuter
                     var res = task.Value.ShouldExecuteNow(now);
                     if (res.ShouldExecuteNow)
                     {
-                        log.InfoFormat("Marking task {0} as stared", task.Value.ToString());
-                        log.InfoFormat(" - using triger {0}", res.UsedTrigger.Name ?? "Unnamed");
+                        Log.InfoFormat("Marking task {0} as stared", task.Value);
+                        Log.InfoFormat(" - using triger {0}", res.UsedTrigger.Name ?? "Unnamed");
                         task.Value.MarkAsStarted(now);
-                        System.Threading.Thread runTask = new System.Threading.Thread(new System.Threading.ParameterizedThreadStart(_runTask));
+                        System.Threading.Thread runTask = new System.Threading.Thread(_runTask);
                         runTask.Start(task.Value);
                     }
                 }
@@ -64,38 +62,36 @@ namespace SharpTaskExecuter
                     UpdateEnquedTasks();
                 }
             }
-            log.Info("Enqued tasks stopped!");
+            Log.Info("Enqued tasks stopped!");
         }
 
-        void _runTask(object TaskToRunObject)
+        void _runTask(object taskToRunObject)
         {
-            EnquedTask TaskToRun = (EnquedTask)TaskToRunObject;
-            log.InfoFormat("Starting task: {0}", TaskToRun.Task.GetType().ToString());
+            EnquedTask taskToRun = (EnquedTask)taskToRunObject;
+            Log.InfoFormat("Starting task: {0}", taskToRun.Task.GetType());
 
-            var result = TaskToRun.Task.RunTask(TaskToRun.Parameters);
+            var result = taskToRun.Task.RunTask(taskToRun.Parameters);
             if (result.TaskFinished)
             {
                 if (result.Sucessfull)
                 {
-                    TaskToRun.MarkAsFinishedOk(DateTime.Now);
-                    log.InfoFormat("Finished OK: {0}", TaskToRun.Task.GetType().ToString());
+                    taskToRun.MarkAsFinishedOk(DateTime.Now);
+                    Log.InfoFormat("Finished OK: {0}", taskToRun.Task.GetType());
                 }
                 else
                 {
-                    TaskToRun.MarkAsFinishedError(DateTime.Now);
-                    log.ErrorFormat("Finished with error: {0}", TaskToRun.Task.GetType().ToString());
+                    taskToRun.MarkAsFinishedError(DateTime.Now);
+                    Log.ErrorFormat("Finished with error: {0}", taskToRun.Task.GetType());
                 }
             }
         }
 
         void UpdateEnquedTasks()
         {
-            log.Info("Loading tasks...");
+            Log.Info("Loading tasks...");
             if (_enquedTasks == null) _enquedTasks = new Dictionary<Guid, EnquedTask>();
-            var type = typeof(ISharpTask);
 
-            TypeInfo LoadedTaskType = null;
-            DLLLoadState dllLoadState = null;
+            DllLoadState dllLoadState = null;
 
             foreach (var item in _dllLoadedList)
                 item.Value.FilePresenceConfirmed = false;
@@ -107,19 +103,19 @@ namespace SharpTaskExecuter
                 var path = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), _parameter.TaskLibrary);
                 if (System.IO.Directory.Exists(path))
                 {
-                    log.InfoFormat("Task .dll directoryu: {0}", path);
+                    Log.InfoFormat("Task .dll directoryu: {0}", path);
                     var dllFileList = System.IO.Directory.GetFiles(path, "*.dll");
 
                     foreach (var file in dllFileList)
                     {
-                        log.InfoFormat("Investigating file: {0}", System.IO.Path.GetFileName(file));
+                        Log.InfoFormat("Investigating file: {0}", System.IO.Path.GetFileName(file));
 
                         if (!_dllLoadedList.ContainsKey(file))
                         {
-                            dllLoadState = new DLLLoadState()
+                            dllLoadState = new DllLoadState()
                             {
-                                DLLName = file,
-                                DLLFileName = file,
+                                DllName = file,
+                                DllFileName = file,
                                 FilePresenceConfirmed = true
                             };
                         }
@@ -129,32 +125,32 @@ namespace SharpTaskExecuter
                             dllLoadState.FilePresenceConfirmed = true;
                         }
 
-                        var res = _dllLoadedList.Count(x => (x.Value.DLLName == file) && (x.Value.LoadError));
+                        var res = _dllLoadedList.Count(x => (x.Value.DllName == file) && (x.Value.LoadError));
                         if (res > 0) continue;
 
-                        var DLL = Assembly.LoadFile(file);
+                        var dll = Assembly.LoadFile(file);
 
-                        foreach (Type dlltype in DLL.GetExportedTypes())
+                        foreach (Type dlltype in dll.GetExportedTypes())
                         {
-                            LoadedTaskType = dlltype.GetTypeInfo();
+                            var loadedTaskType = dlltype.GetTypeInfo();
 
-                            var ilist = LoadedTaskType.ImplementedInterfaces;
+                            var ilist = loadedTaskType.ImplementedInterfaces;
 
                             if (ilist.Count(z => z.Name.ToLower().Contains("sharptaskinterface")) < 1) continue;
 
                             var sh = (ISharpTask)Activator.CreateInstance(dlltype);
 
                             EnquedTask et = new EnquedTask(sh);
-                            if (!_enquedTasks.ContainsKey(LoadedTaskType.GUID))
+                            if (!_enquedTasks.ContainsKey(loadedTaskType.GUID))
                             {
-                                _enquedTasks.Add(LoadedTaskType.GUID, et);
-                                log.InfoFormat("  Task added: {0} / {1}", LoadedTaskType.GUID.ToString(), LoadedTaskType.GetType().ToString());
+                                _enquedTasks.Add(loadedTaskType.GUID, et);
+                                Log.InfoFormat("  Task added: {0} / {1}", loadedTaskType.GUID.ToString(), loadedTaskType);
                                 foreach (var tt in sh.RunTrigger)
                                 {
                                     var name = tt.Name ?? "Unnamed";
                                     var vtd = tt.TriggerDate.ToString();
-                                    var vtt = (tt.TriggerTime != null) ? tt.TriggerTime.ToString() : "";
-                                    log.DebugFormat("    Trigger: {0} / {1} {2}", name, vtd, vtt);
+                                    var vtt = tt.TriggerTime?.ToString() ?? "";
+                                    Log.DebugFormat("    Trigger: {0} / {1} {2}", name, vtd, vtt);
                                     dllLoadState.ConfirmedLoaded = true;
                                 }
                             }
@@ -163,7 +159,7 @@ namespace SharpTaskExecuter
                 }
                 else
                 {
-                    log.WarnFormat("Task .dll directory can not be found: {0}", path);
+                    Log.WarnFormat("Task .dll directory can not be found: {0}", path);
                 }
 
                 _lastDllLoad = DateTime.Now;
@@ -172,34 +168,34 @@ namespace SharpTaskExecuter
             catch (Exception ex)
             {
                 dllLoadState.LoadError = true;
-                if (!_dllLoadedList.ContainsKey(dllLoadState.DLLName))
+                if (!_dllLoadedList.ContainsKey(dllLoadState.DllName))
                 {
-                    _dllLoadedList.Add(dllLoadState.DLLName, dllLoadState);
+                    _dllLoadedList.Add(dllLoadState.DllName, dllLoadState);
                 }
-                log.WarnFormat("Could not load task .DLL file: {0}", dllLoadState.DLLFileName);
-                log.Warn("Loading .DLL failes",ex);
+                Log.WarnFormat("Could not load task .DLL file: {0}", dllLoadState.DllFileName);
+                Log.Warn("Loading .DLL failes",ex);
             }
 
-            log.InfoFormat("Task loaded: ");
+            Log.InfoFormat("Task loaded: ");
             foreach (var item in _dllLoadedList.Where(x => !x.Value.ConfirmedLoaded && !x.Value.ReportedToGui))
             {
-                log.InfoFormat("  {0}", item.Value.DLLName);
+                Log.InfoFormat("  {0}", item.Value.DllName);
                 item.Value.ReportedToGui = true;
             }
 
-            log.InfoFormat("Task unloaded:");
+            Log.InfoFormat("Task unloaded:");
             foreach (var item in _dllLoadedList.Where(x => !x.Value.LoadError && !x.Value.ReportedToGui))
             {
-                log.InfoFormat("  {0}", item.Value.DLLName);
+                Log.InfoFormat("  {0}", item.Value.DllName);
                 item.Value.ReportedToGui = true;
             }
 
-            log.InfoFormat("DLL files removed:");
+            Log.InfoFormat("DLL files removed:");
             var filelist = _dllLoadedList.Where(x => !x.Value.FilePresenceConfirmed).ToList();
             foreach(var item in filelist)
             {
-                _dllLoadedList.Remove(item.Value.DLLName);
-                log.InfoFormat("  {0}", item.Value.DLLName);
+                _dllLoadedList.Remove(item.Value.DllName);
+                Log.InfoFormat("  {0}", item.Value.DllName);
             }
 
         }

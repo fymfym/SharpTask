@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SharpTask.Task
 {
     public class TriggerWeekday : ITriggerInterface
     {
-
-        STDate _triggerDate;
-        STTime _triggerTime;
-        List<DayOfWeek> _weekdayList;
+        readonly List<DayOfWeek> _weekdayList;
 
         /// <summary>
         /// Starts from StartDateTime date and every at marked weekday at StartDateTime time
@@ -21,38 +16,18 @@ namespace SharpTask.Task
 
         }
 
-        public TriggerWeekday(STDate Startdate, STTime ExecuteTime, List<DayOfWeek> WeekdayList)
+        public TriggerWeekday(StDate startdate, StTime executeTime, List<DayOfWeek> weekdayList)
         {
-            _weekdayList = WeekdayList;
-            _triggerDate = Startdate;
-            _triggerTime = ExecuteTime;
+            _weekdayList = weekdayList;
+            TriggerDate = startdate;
+            TriggerTime = executeTime;
         }
 
         public int Sequence { get; set; }
 
-        public STDate TriggerDate
-        {
-            get
-            {
-                return _triggerDate;
-            }
-            set
-            {
-                _triggerDate = value;
-            }
-        }
+        public StDate TriggerDate { get; set; }
 
-        public STTime TriggerTime
-        {
-            get
-            {
-                return _triggerTime;
-            }
-            set
-            {
-                _triggerTime = value;
-            }
-        }
+        public StTime TriggerTime { get; set; }
 
 
         string ITriggerInterface.Name { get; set; }
@@ -60,15 +35,15 @@ namespace SharpTask.Task
         string ITriggerInterface.Description { get; set; }
 
 
-        public bool ShouldRunNow(DateTime CurrentTime)
+        public bool ShouldRunNow(DateTime currentTime)
         {
-            var ts = new TimeSpan(Helpers.GetTimeOnly(CurrentTime).Ticks - _triggerTime.Ticks).TotalSeconds;
+            var ts = new TimeSpan(Helpers.GetTimeOnly(currentTime).Ticks - TriggerTime.Ticks).TotalSeconds;
 
-            var day = CurrentTime.DayOfWeek;
+            var day = currentTime.DayOfWeek;
             if (ts < 0) return false;
             if (_weekdayList.Count(x => x == day) < 1) return false;
 
-            ts = new TimeSpan(Helpers.GetTimeOnly(CurrentTime).Ticks - _triggerTime.Ticks).TotalSeconds;
+            ts = new TimeSpan(Helpers.GetTimeOnly(currentTime).Ticks - TriggerTime.Ticks).TotalSeconds;
 
             if ((ts >= 0) && (ts <= 5)) return true;
 

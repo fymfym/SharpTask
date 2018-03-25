@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using log4net;
 using SharpTask.Task;
 
 
@@ -11,105 +7,83 @@ namespace SharpTaskExecuter
 {
     public class EnquedTask
     {
-        private static readonly ILog log = LogManager.GetLogger(typeof(EnquedTask));
+        // private static readonly ILog Log = LogManager.GetLogger(typeof(EnquedTask));
 
-        const int StartTimeSlipAllowed = 5;
-        object LockObject = new object();
+        readonly object _lockObject = new object();
 
         public TaskParameters Parameters;
         public enum ExecutionResult { NotSet, Ok, Error };
         public enum ExecuteState { WaitingForStartTrigger, InvestigatingTrigger, WaitingToStart, Executing, Done };
 
-        ExecuteState _executionState;
-        ExecutionResult _executionResult;
         DateTime _lastExecuteStart;
         DateTime _lastExecuteFinished;
-        ISharpTask _task;
-        Dictionary<long,DateTime> _pastExecutions;
+        public readonly Dictionary<long,DateTime> PastExecutions;
 
-        public ExecuteState ExecutingState
+        public ExecuteState ExecutingState { get; private set; }
+
+        public ExecutionResult LatestExecutionResult { get; private set; }
+
+        public EnquedTask(ISharpTask task)
         {
-            get
+            Task = task ?? throw new Exception("Task not set correct");
+            PastExecutions = new Dictionary<long, DateTime>();
+        }
+
+        public ISharpTask Task { get; }
+
+        public void MarkAsStarted(DateTime currentTime)
+        {
+            lock (_lockObject)
             {
-                return _executionState;
+                _lastExecuteStart = currentTime;
+                ExecutingState = ExecuteState.Executing;
             }
         }
 
-        public ExecutionResult LatestExecutionResult
+        public void MarkAsFinishedOk(DateTime currentTime)
         {
-            get
-            {
-                return _executionResult;
-            }
-        }
-
-        public EnquedTask(ISharpTask Task)
-        {
-            _task = Task ?? throw new Exception("Task not set correct");
-            _pastExecutions = new Dictionary<long, DateTime>();
-        }
-
-        public ISharpTask Task
-        {
-            get
-            {
-                return _task;
-            }
-        }
-
-        public void MarkAsStarted(DateTime CurrentTime)
-        {
-            lock (LockObject)
-            {
-                _lastExecuteStart = CurrentTime;
-                _executionState = ExecuteState.Executing;
-            }
-        }
-
-        public void MarkAsFinishedOk(DateTime CurrentTime)
-        {
-            lock (LockObject)
+            lock (_lockObject)
             {
                 _lastExecuteStart = DateTime.MinValue;
-                _lastExecuteFinished = CurrentTime;
-                _executionResult = ExecutionResult.Ok;
-                _executionState = ExecuteState.Done;
+                _lastExecuteFinished = currentTime;
+                LatestExecutionResult = ExecutionResult.Ok;
+                ExecutingState = ExecuteState.Done;
             }
         }
 
-        public void MarkAsFinishedError(DateTime CurrentTime)
+        public void MarkAsFinishedError(DateTime currentTime)
         {
-            lock (LockObject)
+            lock (_lockObject)
             {
 
-                _lastExecuteFinished = CurrentTime;
-                _executionResult = ExecutionResult.Error;
-                _executionState = ExecuteState.Done;
+                _lastExecuteFinished = currentTime;
+                LatestExecutionResult = ExecutionResult.Error;
+                ExecutingState = ExecuteState.Done;
             }
         }
 
-        public ShouldExecuteResult ShouldExecuteNow(DateTime CurrentTime)
+        public ShouldExecuteResult ShouldExecuteNow(DateTime currentTime)
         {
             ShouldExecuteResult res = new ShouldExecuteResult();
-            foreach (var tt in _task.RunTrigger)
+            foreach (var tt in Task.RunTrigger)
             {
-                if (tt.ShouldRunNow(CurrentTime))
+                if (tt.ShouldRunNow(currentTime))
                 {
                     bool run = true;
                     if ((_lastExecuteFinished > DateTime.MinValue) || (_lastExecuteStart > DateTime.MinValue))
                     {
-                        var ts = new TimeSpan(_lastExecuteFinished.Ticks - CurrentTime.Ticks).TotalSeconds;
+                        var ts = new TimeSpan(_lastExecuteFinished.Ticks - currentTime.Ticks).TotalSeconds;
                         if ((ts <= 0) && (ts >= -120)) run = false;
                         if (_lastExecuteStart.Ticks > 0)
                         {
-                            ts = new TimeSpan(_lastExecuteStart.Ticks - CurrentTime.Ticks).TotalSeconds;
+                            ts = new TimeSpan(_lastExecuteStart.Ticks - currentTime.Ticks).TotalSeconds;
                             if (ts <= 0) run = false;
                         }
                     }
 
                     if (run)
                     {
-                        _pastExecutions.Add(tt.GetHashCode(), CurrentTime);
+                        PastExecutions.Add(tt.GetHashCode(), currentTime);
                         res.ShouldExecuteNow = true;
                         res.UsedTrigger = tt;
                         return res;

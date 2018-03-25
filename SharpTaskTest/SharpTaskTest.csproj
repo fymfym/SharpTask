@@ -57,7 +57,7 @@
     <Compile Include="SharpTaskExecuterTest\TestHelpers\TaskOneTimeTrigger201701011200.cs" />
     <Compile Include="SharpTaskExecuterTest\TestHelpers\TemporaryTask.cs" />
     <Compile Include="Misc\TimeTest.cs" />
-    <Compile Include="Misc\DateTest.cs" />
+    <Compile Include="SharpTaskTaskTest\DateTest.cs" />
     <Compile Include="SharpTaskTaskTriggerTest\TriggerRepeatEveryHourTest.cs" />
     <Compile Include="SharpTaskTaskTriggerTest\TriggerRepeatDailyTest.cs" />
     <Compile Include="SharpTaskTaskTriggerTest\TriggerWeekdayTest.cs" />

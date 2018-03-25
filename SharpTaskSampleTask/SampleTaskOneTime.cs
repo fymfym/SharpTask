@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SharpTask.Task;
 
 namespace SharpTaskSampleTask
@@ -16,7 +13,7 @@ namespace SharpTaskSampleTask
             var now = DateTime.Now.AddSeconds(5);
             _triggerList = new List<ITriggerInterface>
             {
-                new TriggerOneTime(new STDate(now), new STTime(now)) { Name = "+05 sec" }
+                new TriggerOneTime(new StDate(now), new StTime(now)) { Name = "+05 sec" }
             };
         }
 
@@ -29,29 +26,11 @@ namespace SharpTaskSampleTask
             }
         }
 
-        public string Name
-        {
-            get
-            {
-                return "Sample task";
-            }
-        }
+        public string Name => "Sample task";
 
-        public string Description
-        {
-            get
-            {
-                return "Sample task description";
-            }
-        }
+        public string Description => "Sample task description";
 
-        public string Owner
-        {
-            get
-            {
-                return "Sample task owner";
-            }
-        }
+        public string Owner => "Sample task owner";
 
         List<ITriggerInterface> ISharpTask.RunTrigger => throw new NotImplementedException();
 

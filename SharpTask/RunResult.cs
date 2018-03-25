@@ -1,37 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace SharpTask.Task
 {
     public class RunResult
     {
-        bool _taskFinished;
-        bool _sucessfull;
         public List<string> LogLines;
 
-        public bool Sucessfull
-        {
-            get
-            {
-                return _sucessfull;
-            }
-        }
+        public bool Sucessfull { get; }
 
-        public bool TaskFinished
-        {
-            get
-            {
-                return _taskFinished;
-            }
-        }
+        public bool TaskFinished { get; }
 
-        public RunResult(bool TaskComplete, bool Sucessfull)
+        public RunResult(bool taskComplete, bool sucessfull)
         {
-            _taskFinished = TaskComplete;
-            _sucessfull = Sucessfull;
+            TaskFinished = taskComplete;
+            Sucessfull = sucessfull;
             LogLines = new List<string>();
         }
     }

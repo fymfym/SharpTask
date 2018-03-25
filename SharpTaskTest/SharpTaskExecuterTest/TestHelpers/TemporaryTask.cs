@@ -1,37 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using SharpTask.Task;
 
 namespace SharTaskTest.SharpTaskExecuterTest.TestHelpers
 {
     public class TemporaryTask : ISharpTask
     {
-        public string Description
-        {
-            get
-            {
-                return "SharTaskTest.SharpTaskExecuterTest.TestHelpers";
-            }
-        }
+        public string Description => "SharTaskTest.SharpTaskExecuterTest.TestHelpers";
 
-        public string Name
-        {
-            get
-            {
-                return "SharTaskTest.SharpTaskExecuterTest.TestHelpers";
-            }
-        }
+        public string Name => "SharTaskTest.SharpTaskExecuterTest.TestHelpers";
 
-        public string Owner
-        {
-            get
-            {
-                return "SharTaskTest.SharpTaskExecuterTest.TestHelpers";
-            }
-        }
+        public string Owner => "SharTaskTest.SharpTaskExecuterTest.TestHelpers";
 
         public List<ITriggerInterface> RunTrigger
         {

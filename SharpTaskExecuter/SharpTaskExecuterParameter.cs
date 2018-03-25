@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SharpTaskExecuter
 {
@@ -15,23 +12,23 @@ namespace SharpTaskExecuter
             TaskLibrary = ".";
         }
 
-        static string GetParameterValue(List<string> KeyValueList, string Name, string DefaultVaue)
+        static string GetParameterValue(List<string> keyValueList, string name, string defaultVaue)
         {
-            var idx = KeyValueList.IndexOf(Name);
+            var idx = keyValueList.IndexOf(name);
             if (idx >= 0)
-                if (KeyValueList.Count() >= idx + 1)
-                    return KeyValueList[idx + 1];
-            return DefaultVaue;
+                if (keyValueList.Count >= idx + 1)
+                    return keyValueList[idx + 1];
+            return defaultVaue;
         }
 
         public static SharpTaskExecuterParameter ParseArgs(string[] args)
         {
-            var Param = new SharpTaskExecuterParameter();
+            var param = new SharpTaskExecuterParameter();
             List<string> lst = args.ToList();
 
-            Param.TaskLibrary = GetParameterValue(lst, "tasklibrary", @".");            
+            param.TaskLibrary = GetParameterValue(lst, "tasklibrary", @".");            
 
-            return Param;
+            return param;
         }
     }
 }

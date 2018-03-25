@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using SharpTask.Task;
 
@@ -15,8 +11,8 @@ namespace SharTaskTest.SharpTaskTaskTriggerTest
         [Test]
         public void TestBeforeTime()
         {
-            var dt = new DateTime(2017, 1, 1, 12, 0, 0);
-            var ott = new TriggerRepeatEveryHour(new STDate(dt), 1);
+            var dt = new DateTime(2017, 1, 1, 12, 2, 0);
+            var ott = new TriggerRepeatEveryHour(1);
             Assert.IsFalse(ott.ShouldRunNow(dt));
         }
 
@@ -24,11 +20,11 @@ namespace SharTaskTest.SharpTaskTaskTriggerTest
         public void TestAfterTimeOneSecond()
         {
             var dt = new DateTime(2017, 1, 1, 12, 2, 0);
-            var ott = new TriggerRepeatEveryHour(new STDate(dt), 2);
+            var ott = new TriggerRepeatEveryHour(2);
             Assert.IsTrue(ott.ShouldRunNow(dt.AddSeconds(1)));
 
             dt = new DateTime(2017, 1, 1, 12, 3, 0);
-            ott = new TriggerRepeatEveryHour(new STDate(dt), 2);
+            ott = new TriggerRepeatEveryHour(2);
             Assert.IsFalse(ott.ShouldRunNow(dt.AddSeconds(1)));
 
         }
@@ -37,7 +33,7 @@ namespace SharTaskTest.SharpTaskTaskTriggerTest
         public void TestOnTime()
         {
             var dt = new DateTime(2017, 1, 1, 12, 3, 0);
-            var ott = new TriggerRepeatEveryHour(new STDate(dt), 3);
+            var ott = new TriggerRepeatEveryHour(3);
             Assert.IsTrue(ott.ShouldRunNow(dt));
         }
 
@@ -45,7 +41,7 @@ namespace SharTaskTest.SharpTaskTaskTriggerTest
         public void TestAfterTime()
         {
             var dt = new DateTime(2017, 1, 1, 12, 5, 0);
-            var ott = new TriggerRepeatEveryHour(new STDate(dt), 4);
+            var ott = new TriggerRepeatEveryHour(4);
             Assert.IsFalse(ott.ShouldRunNow(dt));
         }
 

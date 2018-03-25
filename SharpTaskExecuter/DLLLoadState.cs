@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace SharpTaskExecuter
 {
-    public class DLLLoadState
+    public class DllLoadState
     {
-        public string DLLName;
+        public string DllName;
         public bool LoadError;
         public bool ReportedToGui;
         public bool ConfirmedLoaded;
-        public string DLLFileName;
+        public string DllFileName;
         public bool FilePresenceConfirmed;
     }
 }
