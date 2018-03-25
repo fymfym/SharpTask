@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using SharpTask.Task;
 
 namespace SharTaskTest.SharpTaskTaskTriggerTest
 {
@@ -15,7 +16,7 @@ namespace SharTaskTest.SharpTaskTaskTriggerTest
         public void TestBeforeTime()
         {
             var dt = new DateTime(2017, 1, 1, 12, 0, 0);
-            var ott = new SharpTask.TriggerOneTime(new SharpTask.Date(dt), new SharpTask.Time(dt));
+            var ott = new TriggerOneTime(new STDate(dt), new STTime(dt));
             Assert.IsFalse(ott.ShouldRunNow(dt.AddSeconds(-1)));
         }
 
@@ -23,7 +24,7 @@ namespace SharTaskTest.SharpTaskTaskTriggerTest
         public void TestAfterTimeOneSencond()
         {
             var dt = new DateTime(2017, 1, 1, 12, 0, 0);
-            var ott = new SharpTask.TriggerOneTime(new SharpTask.Date(dt), new SharpTask.Time(dt));
+            var ott = new TriggerOneTime(new STDate(dt), new STTime(dt));
             Assert.IsTrue(ott.ShouldRunNow(dt.AddSeconds(1)));
         }
 
@@ -31,7 +32,7 @@ namespace SharTaskTest.SharpTaskTaskTriggerTest
         public void TestOnTime()
         {
             var dt = new DateTime(2017, 1, 1, 12, 0, 0);
-            var ott = new SharpTask.TriggerOneTime(new SharpTask.Date(dt), new SharpTask.Time(dt));
+            var ott = new TriggerOneTime(new STDate(dt), new STTime(dt));
             Assert.IsTrue(ott.ShouldRunNow(dt));
         }
     }

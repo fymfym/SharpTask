@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SharpTask
+namespace SharpTask.Task
 {
-    public class TriggerWeekday : TriggerInterface
+    public class TriggerWeekday : ITriggerInterface
     {
 
-        Date _triggerDate;
-        Time _triggerTime;
+        STDate _triggerDate;
+        STTime _triggerTime;
         List<DayOfWeek> _weekdayList;
 
         /// <summary>
@@ -21,7 +21,7 @@ namespace SharpTask
 
         }
 
-        public TriggerWeekday(Date Startdate, Time ExecuteTime, List<DayOfWeek> WeekdayList)
+        public TriggerWeekday(STDate Startdate, STTime ExecuteTime, List<DayOfWeek> WeekdayList)
         {
             _weekdayList = WeekdayList;
             _triggerDate = Startdate;
@@ -30,7 +30,7 @@ namespace SharpTask
 
         public int Sequence { get; set; }
 
-        public Date TriggerDate
+        public STDate TriggerDate
         {
             get
             {
@@ -42,7 +42,7 @@ namespace SharpTask
             }
         }
 
-        public Time TriggerTime
+        public STTime TriggerTime
         {
             get
             {
@@ -55,9 +55,9 @@ namespace SharpTask
         }
 
 
-        string TriggerInterface.Name { get; set; }
+        string ITriggerInterface.Name { get; set; }
 
-        string TriggerInterface.Description { get; set; }
+        string ITriggerInterface.Description { get; set; }
 
 
         public bool ShouldRunNow(DateTime CurrentTime)

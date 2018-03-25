@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
+using SharpTask.Task;
 
 namespace SharTaskTest.SharpTaskTaskTest
 {
-[TestFixture]
+    [TestFixture]
     public class DateTest
     {
         [Test]
@@ -15,7 +12,7 @@ namespace SharTaskTest.SharpTaskTaskTest
         {
             DateTime dt = new DateTime(2017, 2, 3, 12, 13, 14);
 
-            SharpTask.Date d = new SharpTask.Date(dt);
+            STDate d = new STDate(dt);
             Assert.IsTrue(d.Year == 2017);
             Assert.IsTrue(d.Month == 2);
             Assert.IsTrue(d.Day == 3);
@@ -32,8 +29,7 @@ namespace SharTaskTest.SharpTaskTaskTest
 
         public void DateCreateTimeInt()
         {
-
-            SharpTask.Date d = new SharpTask.Date(2017,2,3);
+            var d = new STDate(2017,2,3);
             Assert.IsTrue(d.Year == 2017);
             Assert.IsTrue(d.Month == 2);
             Assert.IsTrue(d.Day == 3);

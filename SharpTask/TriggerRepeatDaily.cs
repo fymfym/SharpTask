@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SharpTask
+namespace SharpTask.Task
 {
-    public class TriggerRepeatDaily : TriggerInterface
+    public class TriggerRepeatDaily : ITriggerInterface
     {
 
         string _name;
@@ -14,9 +14,9 @@ namespace SharpTask
         int _sequence;
 
         List<DayOfWeek> _daysTorun;
-        Date _triggerDate;
-        Time _triggerTime;
-        Time _startTime;
+        STDate _triggerDate;
+        STTime _triggerTime;
+        STTime _startTime;
 
         public int Sequence
         {
@@ -56,7 +56,7 @@ namespace SharpTask
             }
         }
 
-        public Date TriggerDate
+        public STDate TriggerDate
         {
             get
             {
@@ -68,7 +68,7 @@ namespace SharpTask
             }
         }
 
-        public Time TriggerTime
+        public STTime TriggerTime
         {
             get
             {
@@ -80,7 +80,7 @@ namespace SharpTask
             }
         }
 
-        public TriggerRepeatDaily(Date StartDate, List<DayOfWeek> DaysTorun, Time StartTime)
+        public TriggerRepeatDaily(STDate StartDate, List<DayOfWeek> DaysTorun, STTime StartTime)
         {
             _daysTorun = DaysTorun;
             _triggerDate = StartDate;

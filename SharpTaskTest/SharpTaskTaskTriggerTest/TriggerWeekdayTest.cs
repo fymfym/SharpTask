@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using SharpTask.Task;
 
 namespace SharTaskTest.SharpTaskTaskTriggerTest
 {
@@ -12,11 +13,13 @@ namespace SharTaskTest.SharpTaskTaskTriggerTest
     public class TriggerWeekdayTest
     {
  
-        SharpTask.TriggerInterface GetTriggerTime()
+        ITriggerInterface GetTriggerTime()
         {
-            var wdl = new List<DayOfWeek>();
-            wdl.Add(DayOfWeek.Monday);
-            return new SharpTask.TriggerWeekday(new SharpTask.Date(2017,1,1), new SharpTask.Time(12,0,0), wdl);
+            var wdl = new List<DayOfWeek>
+            {
+                DayOfWeek.Monday
+            };
+            return new TriggerWeekday(new STDate(2017,1,1), new STTime(12,0,0), wdl);
         }
 
         [Test]

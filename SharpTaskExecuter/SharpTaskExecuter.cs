@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using log4net;
+using SharpTask.Task;
 
 namespace SharpTaskExecuter
 {
@@ -91,7 +92,7 @@ namespace SharpTaskExecuter
         {
             log.Info("Loading tasks...");
             if (_enquedTasks == null) _enquedTasks = new Dictionary<Guid, EnquedTask>();
-            var type = typeof(SharpTask.ISharpTaskInterface);
+            var type = typeof(ISharpTask);
 
             TypeInfo LoadedTaskType = null;
             DLLLoadState dllLoadState = null;
@@ -141,7 +142,7 @@ namespace SharpTaskExecuter
 
                             if (ilist.Count(z => z.Name.ToLower().Contains("sharptaskinterface")) < 1) continue;
 
-                            var sh = (SharpTask.ISharpTaskInterface)Activator.CreateInstance(dlltype);
+                            var sh = (ISharpTask)Activator.CreateInstance(dlltype);
 
                             EnquedTask et = new EnquedTask(sh);
                             if (!_enquedTasks.ContainsKey(LoadedTaskType.GUID))

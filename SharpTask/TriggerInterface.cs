@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SharpTask
+namespace SharpTask.Task
 {
-    public interface TriggerInterface
+    public interface ITriggerInterface
     {
-        Date TriggerDate { get; set; }
-        Time TriggerTime { get; set; }
+        STDate TriggerDate { get; set; }
+        STTime TriggerTime { get; set; }
         string Name { get; set; }
         string Description { get; set; }
         int Sequence { get; set; }

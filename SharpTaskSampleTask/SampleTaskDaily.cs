@@ -3,34 +3,36 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SharpTask;
+using SharpTask.Task;
 
 namespace SharpTaskSampleTask
 {
-    public class SampleTaskDaily : SharpTask.ISharpTaskInterface
+    public class SampleTaskDaily : ISharpTask
     {
-        List<SharpTask.TriggerInterface> _triggerList;
+        List<ITriggerInterface> _triggerList;
 
         private void CreateTriggerList()
         {
-            _triggerList = new List<TriggerInterface>();
-            var stl = new SharpTask.Time(0,0,0);
+            _triggerList = new List<ITriggerInterface>();
+            var stl = new STTime(0,0,0);
             int sec = 30;
 
-            var dl = new List<DayOfWeek>();
-            dl.Add(DayOfWeek.Thursday);
+            var dl = new List<DayOfWeek>
+            {
+                DayOfWeek.Thursday
+            };
 
             for (int x = 0; x < 5; x++)
             {
-                stl = new SharpTask.Time(0, 0, sec);
-                var rdt = new SharpTask.TriggerRepeatDaily(new SharpTask.Date(DateTime.Now.AddDays(-1)), dl, stl) { Name = "Every 30 sec trigger - 5 times " };
+                stl = new STTime(0, 0, sec);
+                var rdt = new TriggerRepeatDaily(new STDate(DateTime.Now.AddDays(-1)), dl, stl) { Name = "Every 30 sec trigger - 5 times " };
                 _triggerList.Add(rdt);
                 sec = sec + 30;
             }
 
         }
 
-        public List<SharpTask.TriggerInterface> RunTrigger
+        public List<ITriggerInterface> RunTrigger
         {
             get
             {
@@ -62,6 +64,8 @@ namespace SharpTaskSampleTask
                 return "Sample task owner";
             }
         }
+
+        List<ITriggerInterface> ISharpTask.RunTrigger => throw new NotImplementedException();
 
         public RunResult RunTask(TaskParameters taskParameters)
         {

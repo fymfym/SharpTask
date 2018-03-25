@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SharpTask
+namespace SharpTask.Task
 {
-    public class TriggerOneTime : TriggerInterface
+    public class TriggerOneTime : ITriggerInterface
     {
         string _name;
         string _description;
@@ -36,7 +36,7 @@ namespace SharpTask
 
         public int Sequence { get; set; }
 
-        public Date TriggerDate
+        public STDate TriggerDate
         {
             get
             {
@@ -48,7 +48,7 @@ namespace SharpTask
             }
         }
 
-        public Time TriggerTime
+        public STTime TriggerTime
         {
             get
             {
@@ -60,10 +60,10 @@ namespace SharpTask
             }
         }
 
-        Date _triggerDate;
-        Time _triggerTime;
+        STDate _triggerDate;
+        STTime _triggerTime;
 
-        public TriggerOneTime(Date TriggerDate, Time TriggerTime)
+        public TriggerOneTime(STDate TriggerDate, STTime TriggerTime)
         {
             _triggerDate = TriggerDate;
             _triggerTime = TriggerTime;

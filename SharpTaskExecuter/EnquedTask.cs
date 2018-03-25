@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using log4net;
+using SharpTask.Task;
+
 
 namespace SharpTaskExecuter
 {
@@ -14,7 +16,7 @@ namespace SharpTaskExecuter
         const int StartTimeSlipAllowed = 5;
         object LockObject = new object();
 
-        public SharpTask.TaskParameters Parameters;
+        public TaskParameters Parameters;
         public enum ExecutionResult { NotSet, Ok, Error };
         public enum ExecuteState { WaitingForStartTrigger, InvestigatingTrigger, WaitingToStart, Executing, Done };
 
@@ -22,7 +24,7 @@ namespace SharpTaskExecuter
         ExecutionResult _executionResult;
         DateTime _lastExecuteStart;
         DateTime _lastExecuteFinished;
-        SharpTask.ISharpTaskInterface _task;
+        ISharpTask _task;
         Dictionary<long,DateTime> _pastExecutions;
 
         public ExecuteState ExecutingState
@@ -41,14 +43,13 @@ namespace SharpTaskExecuter
             }
         }
 
-        public EnquedTask(SharpTask.ISharpTaskInterface Task)
+        public EnquedTask(ISharpTask Task)
         {
-            if (Task == null) throw new Exception("Task not set correct");
-            _task = Task;
+            _task = Task ?? throw new Exception("Task not set correct");
             _pastExecutions = new Dictionary<long, DateTime>();
         }
 
-        public SharpTask.ISharpTaskInterface Task
+        public ISharpTask Task
         {
             get
             {

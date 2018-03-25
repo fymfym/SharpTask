@@ -1,0 +1,8 @@
+d:\data\projects\SharpTask\SharpTask\bin\Debug\SharpTask.Task.dll.config
+d:\data\projects\SharpTask\SharpTask\bin\Debug\SharpTask.Task.dll
+d:\data\projects\SharpTask\SharpTask\bin\Debug\SharpTask.Task.pdb
+d:\data\projects\SharpTask\SharpTask\bin\Debug\log4net.dll
+d:\data\projects\SharpTask\SharpTask\bin\Debug\log4net.xml
+d:\data\projects\SharpTask\SharpTask\obj\Debug\SharpTask.Task.csproj.CoreCompileInputs.cache
+d:\data\projects\SharpTask\SharpTask\obj\Debug\SharpTask.Task.dll
+d:\data\projects\SharpTask\SharpTask\obj\Debug\SharpTask.Task.pdb

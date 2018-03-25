@@ -1,0 +1,14 @@
+D:\data\projects\SharpTask\SharpTaskExecuterService\bin\Debug\SharpTaskExecuterService.exe.config
+D:\data\projects\SharpTask\SharpTaskExecuterService\bin\Debug\SharpTaskExecuterService.exe
+D:\data\projects\SharpTask\SharpTaskExecuterService\bin\Debug\SharpTaskExecuterService.pdb
+D:\data\projects\SharpTask\SharpTaskExecuterService\bin\Debug\log4net.dll
+D:\data\projects\SharpTask\SharpTaskExecuterService\bin\Debug\SharpTaskExecuter.dll
+D:\data\projects\SharpTask\SharpTaskExecuterService\bin\Debug\SharpTask.Task.dll
+D:\data\projects\SharpTask\SharpTaskExecuterService\bin\Debug\SharpTaskExecuter.pdb
+D:\data\projects\SharpTask\SharpTaskExecuterService\bin\Debug\log4net.xml
+D:\data\projects\SharpTask\SharpTaskExecuterService\bin\Debug\SharpTask.Task.pdb
+D:\data\projects\SharpTask\SharpTaskExecuterService\bin\Debug\SharpTask.Task.dll.config
+D:\data\projects\SharpTask\SharpTaskExecuterService\obj\Debug\SharpTask.Executer.Service.csprojResolveAssemblyReference.cache
+D:\data\projects\SharpTask\SharpTaskExecuterService\obj\Debug\SharpTask.Executer.Service.csproj.CoreCompileInputs.cache
+D:\data\projects\SharpTask\SharpTaskExecuterService\obj\Debug\SharpTaskExecuterService.exe
+D:\data\projects\SharpTask\SharpTaskExecuterService\obj\Debug\SharpTaskExecuterService.pdb

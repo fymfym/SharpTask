@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SharpTask
+namespace SharpTask.Task
 {
     public static class Helpers
     {

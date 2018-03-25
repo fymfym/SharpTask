@@ -4,18 +4,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using SharpTask.Task;
 
 namespace SharTaskTest.SharpTaskTaskTest
 {
     [TestFixture]
-    public class timeTest
+    public class TimeTest
     {
         [Test]
         public void DateCreateTimeDate()
         {
             DateTime dt = new DateTime(2017, 2, 3, 13, 14, 15);
 
-            SharpTask.Time d = new SharpTask.Time(dt);
+            STTime d = new STTime(dt);
             Assert.IsTrue(d.Hour == 13);
             Assert.IsTrue(d.Minute == 14);
             Assert.IsTrue(d.Second == 15);
@@ -30,10 +31,11 @@ namespace SharTaskTest.SharpTaskTaskTest
 
         }
 
+        [Test]
         public void DateCreateTimeInt()
         {
 
-            SharpTask.Date d = new SharpTask.Date(2017, 2, 3);
+            STDate d = new STDate(2017, 2, 3);
             Assert.IsTrue(d.Year == 2017);
             Assert.IsTrue(d.Month == 2);
             Assert.IsTrue(d.Day == 3);

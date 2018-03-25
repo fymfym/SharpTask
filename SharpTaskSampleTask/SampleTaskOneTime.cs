@@ -3,22 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SharpTask;
+using SharpTask.Task;
 
 namespace SharpTaskSampleTask
 {
-    public class SharpTaskSampleTask : SharpTask.ISharpTaskInterface
+    public class SharpTaskSampleTask : ISharpTask
     {
-        List<SharpTask.TriggerInterface> _triggerList;
+        List<ITriggerInterface> _triggerList;
 
         private void CreateTriggerList()
         {
             var now = DateTime.Now.AddSeconds(5);
-            _triggerList = new List<TriggerInterface>();
-            _triggerList.Add(new TriggerOneTime(new Date(now), new Time(now)) { Name = "+05 sec" });
+            _triggerList = new List<ITriggerInterface>
+            {
+                new TriggerOneTime(new STDate(now), new STTime(now)) { Name = "+05 sec" }
+            };
         }
 
-        public List<SharpTask.TriggerInterface> RunTrigger
+        public List<ITriggerInterface> RunTrigger
         {
             get
             {
@@ -50,6 +52,8 @@ namespace SharpTaskSampleTask
                 return "Sample task owner";
             }
         }
+
+        List<ITriggerInterface> ISharpTask.RunTrigger => throw new NotImplementedException();
 
         public RunResult RunTask(TaskParameters taskParameters)
         {

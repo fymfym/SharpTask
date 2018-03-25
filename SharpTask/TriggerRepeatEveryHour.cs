@@ -3,18 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SharpTask.Task;
 
-namespace SharpTask
+namespace SharpTask.Task
 {
-    public class TriggerRepeatEveryHour : TriggerInterface
+    public class TriggerRepeatEveryHour : ITriggerInterface
     {
 
         string _name;
         string _description;
         int _sequence;
 
-        Date _triggerDate;
-        Time _triggerTime;
+        STDate _triggerDate;
+        STTime _triggerTime;
         int _repeatMinute;
 
         public int Sequence
@@ -55,7 +56,7 @@ namespace SharpTask
             }
         }
 
-        public Date TriggerDate
+        public STDate TriggerDate
         {
             get
             {
@@ -67,7 +68,7 @@ namespace SharpTask
             }
         }
 
-        public Time TriggerTime
+        public STTime TriggerTime
         {
             get
             {
@@ -79,7 +80,7 @@ namespace SharpTask
             }
         }
 
-        public TriggerRepeatEveryHour(Date StartDate, int RepeatMinute)
+        public TriggerRepeatEveryHour(STDate StartDate, int RepeatMinute)
         {
             _repeatMinute = RepeatMinute;
         }
@@ -88,10 +89,10 @@ namespace SharpTask
         {
             if (CurrentTime.Minute != _repeatMinute) return false;
 
-            var ts = new TimeSpan(Helpers.GetTimeOnly(CurrentTime).Ticks - new Time(CurrentTime.Hour,_repeatMinute,0).Ticks).TotalSeconds;
+            var ts = new TimeSpan(Helpers.GetTimeOnly(CurrentTime).Ticks - new STTime(CurrentTime.Hour,_repeatMinute,0).Ticks).TotalSeconds;
             if ((ts >= 0) && (ts <= 5))
             {
-                _triggerTime = new SharpTask.Time(CurrentTime);
+                _triggerTime = new STTime(CurrentTime);
                 return true;
             }
             return false;
