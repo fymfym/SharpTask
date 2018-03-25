@@ -20,7 +20,3 @@ Use case:
 - Copy the .DLL file to the TaskLibrary of the service
 - The service picks it up and runs the tasks at "trigger timer"
 
-Outstanding issues:
-- Unload an already loaded .DLL file
-  - Copy to a runtime directory
-  - Monitor original directory for activity, unload .DLL on delete from directory
