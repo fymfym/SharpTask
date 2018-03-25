@@ -1,9 +1,0 @@
-D:\data\projects\SharpTask\SharpTaskSampleTask\bin\Debug\SharpTaskSampleTask.dll
-D:\data\projects\SharpTask\SharpTaskSampleTask\bin\Debug\SharpTaskSampleTask.pdb
-D:\data\projects\SharpTask\SharpTaskSampleTask\bin\Debug\SharpTask.Task.dll
-D:\data\projects\SharpTask\SharpTaskSampleTask\bin\Debug\SharpTask.Task.pdb
-D:\data\projects\SharpTask\SharpTaskSampleTask\bin\Debug\SharpTask.Task.dll.config
-D:\data\projects\SharpTask\SharpTaskSampleTask\obj\Debug\SharpTask.SampleTask.csprojResolveAssemblyReference.cache
-D:\data\projects\SharpTask\SharpTaskSampleTask\obj\Debug\SharpTask.SampleTask.csproj.CoreCompileInputs.cache
-D:\data\projects\SharpTask\SharpTaskSampleTask\obj\Debug\SharpTaskSampleTask.dll
-D:\data\projects\SharpTask\SharpTaskSampleTask\obj\Debug\SharpTaskSampleTask.pdb

@@ -1,9 +1,0 @@
-d:\data\projects\SharpTask\SharpTask\bin\Debug\SharpTaskTask.dll.config
-d:\data\projects\SharpTask\SharpTask\bin\Debug\SharpTaskTask.dll
-d:\data\projects\SharpTask\SharpTask\bin\Debug\SharpTaskTask.pdb
-d:\data\projects\SharpTask\SharpTask\bin\Debug\log4net.dll
-d:\data\projects\SharpTask\SharpTask\bin\Debug\log4net.xml
-d:\data\projects\SharpTask\SharpTask\obj\Debug\SharpTaskTask.csprojResolveAssemblyReference.cache
-d:\data\projects\SharpTask\SharpTask\obj\Debug\SharpTaskTask.csproj.CoreCompileInputs.cache
-d:\data\projects\SharpTask\SharpTask\obj\Debug\SharpTaskTask.dll
-d:\data\projects\SharpTask\SharpTask\obj\Debug\SharpTaskTask.pdb

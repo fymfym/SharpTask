@@ -1,2 +1,0 @@
-D:\data\projects\SharpTask\SharpTaskExecuterService\obj\Debug\SharpTaskExecuterService.csprojResolveAssemblyReference.cache
-D:\data\projects\SharpTask\SharpTaskExecuterService\obj\Debug\SharpTaskExecuterService.csproj.CoreCompileInputs.cache
