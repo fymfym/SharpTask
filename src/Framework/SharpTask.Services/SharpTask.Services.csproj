@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SharpTask.Models\SharpTask.Models.csproj" />
+    <ProjectReference Include="..\SharpTask.Repository\SharpTask.Repository.csproj" />
+  </ItemGroup>
+
+</Project>
