@@ -1,8 +1,13 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net.Sockets;
+using System.Reflection;
+using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 using SharpTask.Core.Models.Task;
+using SharpTask.Core.Models.TaskModule;
 using SharpTask.Core.Services.TaskCollection;
 using SharpTask.Core.Services.TaskDirectoryManipulation;
 using SharpTask.Core.Services.TaskDllLoader;
@@ -17,7 +22,7 @@ namespace SharpTask.Core.Services.TaskExecuter
         private readonly ITaskDirectoryManipulationService _taskDirectoryManipulationService;
 
         bool _running;
-        Dictionary<long, DllLoadState> _activeTasks;
+        Dictionary<long, AssemblyLibraryState> _activeTasks;
 
         public TaskExecuterService(
             ILogger<TaskExecuterService> logger,
@@ -31,7 +36,7 @@ namespace SharpTask.Core.Services.TaskExecuter
             _taskDllLoaderService = taskDllLoaderService;
             _taskDirectoryManipulationService = taskDirectoryManipulationService;
 
-            _activeTasks = new Dictionary<long, DllLoadState>();
+            _activeTasks = new Dictionary<long, AssemblyLibraryState>();
         }
 
         public void Start()
@@ -42,71 +47,108 @@ namespace SharpTask.Core.Services.TaskExecuter
             while (_running)
             {
 
-                var closableTasksTask = _taskCollectionService.GetClosableTask();
-                var runnableTasksTask = _taskCollectionService.GetRunnableTask();
+                var unloadableTaskTasks = _taskCollectionService.GetUnloadbleTask();
                 var newTasksTask = _taskCollectionService.GetNewTask();
-                Task.WaitAll(closableTasksTask,runnableTasksTask, newTasksTask);
-                var closableTasks = closableTasksTask.Result;
-                var runnableTasks = runnableTasksTask.Result;
-                var newTasks = newTasksTask.Result;
+                Task.WaitAll(unloadableTaskTasks, newTasksTask);
+                HandleUnloadableTasks(unloadableTaskTasks.Result);
+                HandleNewTasks(newTasksTask.Result);
 
-                foreach (var task in closableTasks)
-                {
-                    if (_activeTasks.ContainsKey(task.Hash))
-                    {
-                        _logger.LogInformation("{@action}{@task}",
-                            "Removing task",
-                            task.FullFileName);
-                        _activeTasks[task.Hash].DisposeInstance();
-                        _activeTasks.Remove(task.Hash);
-                        _taskDirectoryManipulationService.MoveTaskFromRunToUnloadFolder(task);
-                    }
-                }
-
-                foreach (var task in newTasks)
-                {
-                    if (_activeTasks.ContainsKey(task.Hash)) continue;
-                    _logger.LogInformation("{@action}{@task}",
-                        "Adding tasks from pickup folder",
-                        task.FullFileName);
-
-
-                    ISharpTask taskInstance;
-                    try
-                    {
-                        _logger.LogInformation("{@action}{@task}",
-                            "Instanciate task",
-                            task.FullFileName);
-                        taskInstance = _taskDllLoaderService.LoadDll(task);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogWarning("{@action}{@taskfile}{@exception}",
-                            "TaskInstance not loaded",
-                            task.FullFileName,
-                            ex.ToString());
-                        _taskDirectoryManipulationService.MoveTaskFromPickupToErrorFolder(task);
-                        continue;
-                    }
-
-                    _activeTasks.Add(task.Hash, new DllLoadState(task, taskInstance));
-
-                    _logger.LogInformation("{@action}{@task}",
-                        "TaskInstance instance added",
-                        task.FullFileName);
-                    _taskDirectoryManipulationService.MoveTaskFromPickupToRunFolder(task);
-                }
-
-                foreach (var taskModuleInformation in runnableTasks)
-                {
-                    
-                }
+                var runnableTasksTask = _taskCollectionService.GetRunnableTask();
+                Task.WaitAll(runnableTasksTask);
+                HandleRunnableTasks(runnableTasksTask.Result);
             }
         }
 
         public void Stop()
         {
             _running = false;
+        }
+
+        private void HandleRunnableTasks(IEnumerable<TaskModuleInformation> runnableTasks)
+        {
+            foreach (var taskModuleInformation in runnableTasks)
+            {
+                var assembly = _taskDllLoaderService.LoadAssembly(taskModuleInformation);
+
+                var classes = from exported in assembly.ExportedTypes
+                    where exported.IsClass  
+                    select exported as TypeInfo;
+              
+                foreach (var cls in classes)
+                {
+                    if (cls.ImplementedInterfaces.Any(x =>
+                        x.FullName.Equals("SharpTask.Core.Models.Task.ISharpTask")))
+                    {
+                        var instance = (ISharpTask)Activator.CreateInstance(cls);
+                        _logger.LogInformation("{@action}{@taskName}{@Tasktype}{@TaskDescription}",
+                            "Instaciation class",
+                            instance.Name,
+                            instance.GetType(),
+                            instance.Description);
+                        var result = instance.RunTask(null);
+                    }
+                }
+
+            }
+        }
+
+        private void HandleNewTasks(IEnumerable<TaskModuleInformation> newTasks)
+        {
+            foreach (var task in newTasks)
+            {
+                if (_activeTasks.ContainsKey(task.Hash)) continue;
+                _logger.LogInformation("{@action}{@task}",
+                    "Adding tasks from pickup folder",
+                    task.FullFileName);
+
+                try
+                {
+                    _logger.LogInformation("{@action}{@task}",
+                        "Instanciate task",
+                        task.FullFileName);
+                    var assembly = _taskDllLoaderService.LoadAssembly(task);
+
+                    _logger.LogInformation("{@action}{@task}{@class}",
+                        "TaskAssembly instance added",
+                        assembly.FullName,
+                        assembly.GetType());
+                    _activeTasks.Add(
+                        task.Hash,
+                        new AssemblyLibraryState(
+                            task,
+                            assembly
+                        )
+                    );
+                    _taskDirectoryManipulationService.CopyTaskFromPickupToRunFolder(task);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning("{@action}{@taskfile}{@exception}",
+                        "TaskAssembly loaded failed, multipl possible reasons",
+                        task.FullFileName,
+                        ex.ToString());
+                    _taskDirectoryManipulationService.MoveTaskFromPickupToErrorFolder(task);
+                    continue;
+                }
+
+            }
+        }
+
+        private void HandleUnloadableTasks(IEnumerable<TaskModuleInformation> closableTasks)
+        {
+            foreach (var task in closableTasks)
+            {
+                if (_activeTasks.ContainsKey(task.Hash))
+                {
+                    _logger.LogInformation("{@action}{@task}",
+                        "Removing task",
+                        task.FullFileName);
+                    _activeTasks[task.Hash].DisposeAssembly();
+                    _activeTasks.Remove(task.Hash);
+                }
+                _taskDirectoryManipulationService.MoveTaskFromRunToUnloadFolder(task);
+            }
+
         }
 
         public void ExecuteDllLoadStateTasks()
@@ -130,7 +172,7 @@ namespace SharpTask.Core.Services.TaskExecuter
                 System.Threading.Thread.Sleep(1000);
 
 
-//                if (new TimeSpan(DateTime.Now.Ticks - _lastDllLoad.Ticks).TotalSeconds > 30)
+                //                if (new TimeSpan(DateTime.Now.Ticks - _lastDllLoad.Ticks).TotalSeconds > 30)
                 {
                     //UpdateEnquedTasks();
                 }
@@ -140,23 +182,23 @@ namespace SharpTask.Core.Services.TaskExecuter
 
         void _runTask(object taskToRunObject)
         {
-            DllLoadState taskToRun = (DllLoadState)taskToRunObject;
-            _logger.LogInformation("Starting task: {0}", taskToRun.TaskInstance.GetType());
+            AssemblyLibraryState taskToRun = (AssemblyLibraryState)taskToRunObject;
+            _logger.LogInformation("Starting task: {0}", taskToRun.TaskAssembly.GetType());
 
-            var result = taskToRun.TaskInstance.RunTask(taskToRun.Parameters);
-            if (result.TaskFinished)
-            {
-                if (result.Sucessfull)
-                {
-                    taskToRun.MarkAsFinishedOk(DateTime.Now);
-                    _logger.LogInformation("Finished OK: {0}", taskToRun.TaskInstance.GetType());
-                }
-                else
-                {
-                    taskToRun.MarkAsFinishedError(DateTime.Now);
-                    _logger.LogInformation("Finished with error: {0}", taskToRun.TaskInstance.GetType());
-                }
-            }
+            //var result = taskToRun.TaskAssembly.RunTask(taskToRun.Parameters);
+            //if (result.TaskFinished)
+            //{
+            //    if (result.Sucessfull)
+            //    {
+            //        taskToRun.MarkAsFinishedOk(DateTime.Now);
+            //        _logger.LogInformation("Finished OK: {0}", taskToRun.TaskAssembly.GetType());
+            //    }
+            //    else
+            //    {
+            //        taskToRun.MarkAsFinishedError(DateTime.Now);
+            //        _logger.LogInformation("Finished with error: {0}", taskToRun.TaskAssembly.GetType());
+            //    }
+            //}
         }
 
     }

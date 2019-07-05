@@ -12,7 +12,7 @@ namespace SharpTask.Core.Test.SharpTaskExecuterTest
         {
             var dt = new DateTime(2017, 1, 1, 12, 00, 00);
             var t = new TaskWeeklyTriggerMonday();
-            var et = new DllLoadState(null,t);
+            var et = new AssemblyLibraryState(null,null);
             Assert.False(et.ShouldExecuteNow(dt).ShouldExecuteNow);
         }
 
@@ -21,7 +21,7 @@ namespace SharpTask.Core.Test.SharpTaskExecuterTest
         {
             var dt = new DateTime(2017, 1, 2, 12, 00, 00);
             var t = new TaskWeeklyTriggerMonday();
-            var et = new DllLoadState(null,t);
+            var et = new AssemblyLibraryState(null,null);
             Assert.True(et.ShouldExecuteNow(dt).ShouldExecuteNow);
             et.MarkAsFinishedOk(dt);
             Assert.False(et.ShouldExecuteNow(dt).ShouldExecuteNow);
@@ -32,7 +32,7 @@ namespace SharpTask.Core.Test.SharpTaskExecuterTest
         {
             var dt = new DateTime(2017, 1, 2, 12, 00, 01);
             var t = new TaskWeeklyTriggerMonday();
-            var et = new DllLoadState(null,t);
+            var et = new AssemblyLibraryState(null,null);
             Assert.True(et.ShouldExecuteNow(dt).ShouldExecuteNow);
         }
 
@@ -41,7 +41,7 @@ namespace SharpTask.Core.Test.SharpTaskExecuterTest
         {
             var dt = new DateTime(2017, 1, 2, 12, 00, 06);
             var t = new TaskWeeklyTriggerMonday();
-            var et = new DllLoadState(null,t);
+            var et = new AssemblyLibraryState(null,null);
             Assert.False(et.ShouldExecuteNow(dt).ShouldExecuteNow);
         }
 
@@ -50,7 +50,7 @@ namespace SharpTask.Core.Test.SharpTaskExecuterTest
         {
             var dt = new DateTime(2017, 1, 1, 11, 00, 00);
             var t = new TaskWeeklyTriggerMonday();
-            var et = new DllLoadState(null,t);
+            var et = new AssemblyLibraryState(null,null);
             Assert.False(et.ShouldExecuteNow(dt).ShouldExecuteNow);
         }
 
@@ -59,7 +59,7 @@ namespace SharpTask.Core.Test.SharpTaskExecuterTest
         {
             var dt = new DateTime(2017, 1, 1, 13, 00, 00);
             var t = new TaskWeeklyTriggerMonday();
-            var et = new DllLoadState(null,t);
+            var et = new AssemblyLibraryState(null,null);
             Assert.False(et.ShouldExecuteNow(dt).ShouldExecuteNow);
         }
     }

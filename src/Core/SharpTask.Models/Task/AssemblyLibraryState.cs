@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using SharpTask.Core.Models.TaskModule;
 
 namespace SharpTask.Core.Models.Task
 {
-    public class DllLoadState
+    public class AssemblyLibraryState
     {
-        // private static readonly ILog Log = LogManager.GetLogger(typeof(DllLoadState));
+        // private static readonly ILog Log = LogManager.GetLogger(typeof(AssemblyLibraryState));
 
         private readonly object _lockObject = new object();
-        private ISharpTask _taskInstance;
+        private Assembly _taskAssembly;
         private DateTime _lastExecuteStart;
         private DateTime _lastExecuteFinished;
 
@@ -24,22 +25,22 @@ namespace SharpTask.Core.Models.Task
 
         public readonly Dictionary<long,DateTime> PastExecutions;
 
-        public void DisposeInstance()
+        public void DisposeAssembly()
         {
-            _taskInstance = null;
+            _taskAssembly = null;
         }
 
         public ExecuteState ExecutingState { get; private set; }
 
         public ExecutionResult LatestExecutionResult { get; private set; }
 
-        public DllLoadState(TaskModuleInformation taskInformation, ISharpTask task)
+        public AssemblyLibraryState(TaskModuleInformation taskInformation, Assembly assembly)
         {
-            _taskInstance = task ?? throw new Exception("TaskInstance not set correct");
+            _taskAssembly = assembly ?? throw new Exception("TaskAssembly not set correct");
             PastExecutions = new Dictionary<long, DateTime>();
         }
 
-        public ISharpTask TaskInstance => _taskInstance;
+        public Assembly TaskAssembly => _taskAssembly;
 
         public void MarkAsStarted(DateTime currentTime)
         {
@@ -75,31 +76,31 @@ namespace SharpTask.Core.Models.Task
         public ShouldExecuteResult ShouldExecuteNow(DateTime currentTime)
         {
             ShouldExecuteResult res = new ShouldExecuteResult();
-            foreach (var tt in TaskInstance.RunTrigger)
-            {
-                if (tt.ShouldRunNow(currentTime))
-                {
-                    bool run = true;
-                    if ((_lastExecuteFinished > DateTime.MinValue) || (_lastExecuteStart > DateTime.MinValue))
-                    {
-                        var ts = new TimeSpan(_lastExecuteFinished.Ticks - currentTime.Ticks).TotalSeconds;
-                        if ((ts <= 0) && (ts >= -120)) run = false;
-                        if (_lastExecuteStart.Ticks > 0)
-                        {
-                            ts = new TimeSpan(_lastExecuteStart.Ticks - currentTime.Ticks).TotalSeconds;
-                            if (ts <= 0) run = false;
-                        }
-                    }
+            //foreach (var tt in TaskAssembly.)
+            //{
+            //    if (tt.ShouldRunNow(currentTime))
+            //    {
+            //        bool run = true;
+            //        if ((_lastExecuteFinished > DateTime.MinValue) || (_lastExecuteStart > DateTime.MinValue))
+            //        {
+            //            var ts = new TimeSpan(_lastExecuteFinished.Ticks - currentTime.Ticks).TotalSeconds;
+            //            if ((ts <= 0) && (ts >= -120)) run = false;
+            //            if (_lastExecuteStart.Ticks > 0)
+            //            {
+            //                ts = new TimeSpan(_lastExecuteStart.Ticks - currentTime.Ticks).TotalSeconds;
+            //                if (ts <= 0) run = false;
+            //            }
+            //        }
 
-                    if (run)
-                    {
-                        PastExecutions.Add(tt.GetHashCode(), currentTime);
-                        res.ShouldExecuteNow = true;
-                        res.UsedTrigger = tt;
-                        return res;
-                    }
-                }
-            }
+            //        if (run)
+            //        {
+            //            PastExecutions.Add(tt.GetHashCode(), currentTime);
+            //            res.ShouldExecuteNow = true;
+            //            res.UsedTrigger = tt;
+            //            return res;
+            //        }
+            //    }
+            //}
             return res;
         }
     }

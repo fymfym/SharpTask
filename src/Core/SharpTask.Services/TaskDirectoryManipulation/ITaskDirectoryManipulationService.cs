@@ -9,7 +9,7 @@ namespace SharpTask.Core.Services.TaskDirectoryManipulation
         IEnumerable<TaskModuleInformation> GetTasksInPickupFolder();
         IEnumerable<TaskModuleInformation> GetTasksInRunFolder();
 
-        Task<TaskModuleInformation> MoveTaskFromPickupToRunFolder(TaskModuleInformation taskInformation);
+        Task<TaskModuleInformation> CopyTaskFromPickupToRunFolder(TaskModuleInformation taskInformation);
         Task<TaskModuleInformation> MoveTaskFromPickupToErrorFolder(TaskModuleInformation taskInformation);
         Task<TaskModuleInformation> MoveTaskFromRunToUnloadFolder(TaskModuleInformation taskInformation);
     }

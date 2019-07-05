@@ -33,7 +33,7 @@ namespace SharpTask.Core.Cli
         public Task StopAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("Stopping");
-            _taskExecuterService.Start();
+            _taskExecuterService.Stop();
             _logger.LogInformation("Stopped");
             return null;
         }

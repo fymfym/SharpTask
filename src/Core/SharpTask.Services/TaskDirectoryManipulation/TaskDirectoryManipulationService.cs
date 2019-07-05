@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using SharpTask.Core.Models.Configuration;
 using SharpTask.Core.Models.TaskModule;
 using SharpTask.Core.Repository.TaskModule;
@@ -13,14 +14,17 @@ namespace SharpTask.Core.Services.TaskDirectoryManipulation
 
         private readonly TaskDirectoryManipulationConfiguration _configuration;
         private readonly ITaskModuleRepository _taskModuleRepository;
+        private readonly ILogger<TaskDirectoryManipulationService> _logger;
 
         public TaskDirectoryManipulationService(
+            ILogger<TaskDirectoryManipulationService> logger,
             TaskDirectoryManipulationConfiguration configuration,
             ITaskModuleRepository taskModuleRepository
             )
         {
             _configuration = configuration;
             _taskModuleRepository = taskModuleRepository;
+            _logger = logger;
         }
 
         public IEnumerable<TaskModuleInformation> GetTasksInPickupFolder()
@@ -68,11 +72,17 @@ namespace SharpTask.Core.Services.TaskDirectoryManipulation
                    file.CreationTime.ToString(CultureInfo.InvariantCulture).GetHashCode();
         }
 
-        public async Task<TaskModuleInformation> MoveTaskFromPickupToRunFolder(TaskModuleInformation taskInformation)
+        public async Task<TaskModuleInformation> CopyTaskFromPickupToRunFolder(TaskModuleInformation taskInformation)
         {
             var dest = new DirectoryInfo(_configuration.TaskRunFolder);
             var newFile = await _taskModuleRepository.CopyFile(new FileInfo(taskInformation.FullFileName), dest);
             var res = GenerateTaskModuleInformation(newFile);
+
+            _logger.LogInformation("{@action}{@source}{@destination}",
+                "CopyTaskFromPickupToRunFolder",
+                taskInformation,
+                res);
+
             return res;
         }
 
@@ -81,14 +91,27 @@ namespace SharpTask.Core.Services.TaskDirectoryManipulation
             var dest = new DirectoryInfo(_configuration.TaskLoadErrorFolder);
             var newFile = await _taskModuleRepository.MoveFile(new FileInfo(taskInformation.FullFileName), dest);
             var res = GenerateTaskModuleInformation(newFile);
+
+            _logger.LogInformation("{@action}{@source}{@destination}",
+                "MoveTaskFromPickupToErrorFolder",
+                taskInformation,
+                res);
+
             return res;
         }
 
         public async  Task<TaskModuleInformation> MoveTaskFromRunToUnloadFolder(TaskModuleInformation taskInformation)
         {
+
             var dest = new DirectoryInfo(_configuration.TaskUnloadFolder);
             var newFile = await _taskModuleRepository.MoveFile(new FileInfo(taskInformation.FullFileName), dest);
             var res = GenerateTaskModuleInformation(newFile);
+
+            _logger.LogInformation("{@action}{@source}{@destination}",
+                "MoveTaskFromRunToUnloadFolder",
+                taskInformation,
+                res);
+
             return res;
         }
     }

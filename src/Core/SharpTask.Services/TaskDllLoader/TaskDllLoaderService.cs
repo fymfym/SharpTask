@@ -1,5 +1,7 @@
 ﻿using System;
-using System.IO;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Runtime.Loader;
 using SharpTask.Core.Models.Task;
 using SharpTask.Core.Models.TaskModule;
@@ -9,12 +11,27 @@ namespace SharpTask.Core.Services.TaskDllLoader
     public class TaskDllLoaderService : ITaskDllLoaderService
     {
 
-        public ISharpTask LoadDll(TaskModuleInformation taskModule)
+        public Assembly LoadAssembly(TaskModuleInformation taskModule)
         {
             var myAssembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(taskModule.FullFileName);
-            var myType = myAssembly.GetType("SharpTask.Core.Models.TaskInstance.ISharpTask");
-            var myInstance = Activator.CreateInstance(myType);
-            return (ISharpTask)myInstance;
+
+            var types = myAssembly.ExportedTypes;
+            var classes = types.Where(x => x.IsClass).ToList();
+
+            var result = new List<ISharpTask>();
+
+            foreach (var cls in classes.Where(x => x.IsClass))
+            {
+                TypeInfo ti = (TypeInfo) cls;
+                if (ti.ImplementedInterfaces.Any(x =>
+                    x.FullName.Equals("SharpTask.Core.Models.Task.ISharpTask")))
+                {
+//                    var instance = Activator.CreateInstance(cls);
+//                    result.Add(instance as ISharpTask);
+                    return myAssembly;
+                }
+            }
+            throw new Exception("Assembly does not contain implementation of interface <SharpTask.Core.Models.Task.ISharpTask>");
         }
     }
 }

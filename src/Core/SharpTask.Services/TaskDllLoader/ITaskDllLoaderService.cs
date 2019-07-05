@@ -1,10 +1,10 @@
-﻿using SharpTask.Core.Models.Task;
+﻿using System.Reflection;
 using SharpTask.Core.Models.TaskModule;
 
 namespace SharpTask.Core.Services.TaskDllLoader
 {
     public interface ITaskDllLoaderService
     {
-        ISharpTask LoadDll(TaskModuleInformation taskModule);
+        Assembly LoadAssembly(TaskModuleInformation taskModule);
     }
 }

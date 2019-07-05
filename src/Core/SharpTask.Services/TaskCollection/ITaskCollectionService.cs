@@ -11,7 +11,7 @@ namespace SharpTask.Core.Services.TaskCollection
     public interface ITaskCollectionService
     {
         Task<IEnumerable<TaskModuleInformation>> GetRunnableTask();
-        Task<IEnumerable<TaskModuleInformation>> GetClosableTask();
+        Task<IEnumerable<TaskModuleInformation>> GetUnloadbleTask();
         Task<IEnumerable<TaskModuleInformation>> GetNewTask();
     }
 }

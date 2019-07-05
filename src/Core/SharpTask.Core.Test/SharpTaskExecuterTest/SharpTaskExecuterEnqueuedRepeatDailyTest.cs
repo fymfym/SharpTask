@@ -10,7 +10,7 @@ namespace SharpTask.Core.Test.SharpTaskExecuterTest
         public void TaskRepeatHourly01Test()
         {
             var t = new SharTaskTest.SharpTaskExecuterTest.TestHelpers.TaskRepeatHourly01();
-            var et = new DllLoadState(null,t);
+            var et = new AssemblyLibraryState(null,null);
 
             var dt = new DateTime(2017, 1, 1, 0, 0, 0);
             Assert.False(et.ShouldExecuteNow(dt).ShouldExecuteNow);

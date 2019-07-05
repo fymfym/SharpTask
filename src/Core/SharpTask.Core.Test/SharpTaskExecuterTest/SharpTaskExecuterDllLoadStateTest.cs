@@ -13,39 +13,39 @@ namespace SharpTask.Core.Test.SharpTaskExecuterTest
         public void TestDllLoadStateTaskCreation()
         {
             var t = new TemporaryTask();
-            var et = new DllLoadState(new TaskModuleInformation(),  t);
-            Assert.True(et.TaskInstance == t);
-            Assert.True(et.LatestExecutionResult == DllLoadState.ExecutionResult.NotSet);
-            Assert.True(et.ExecutingState == DllLoadState.ExecuteState.WaitingForStartTrigger);
+            var et = new AssemblyLibraryState(new TaskModuleInformation(), null);
+//            Assert.True(et.TaskAssembly == t);
+            Assert.True(et.LatestExecutionResult == AssemblyLibraryState.ExecutionResult.NotSet);
+            Assert.True(et.ExecutingState == AssemblyLibraryState.ExecuteState.WaitingForStartTrigger);
         }
 
         [Fact]
         public void TestDllLoadStateMarkAsStarted()
         {
             var t = new TemporaryTask();
-            var et = new DllLoadState(null,t);
+            var et = new AssemblyLibraryState(null,null);
             et.MarkAsStarted(DateTime.MinValue);
-            Assert.True(et.ExecutingState == DllLoadState.ExecuteState.Executing);
+            Assert.True(et.ExecutingState == AssemblyLibraryState.ExecuteState.Executing);
         }
 
         [Fact]
         public void TestDllLoadStateMarkAsFinishedOk()
         {
             var t = new TemporaryTask();
-            var et = new DllLoadState(null,t);
+            var et = new AssemblyLibraryState(null,null);
             et.MarkAsFinishedOk(DateTime.MinValue);
-            Assert.True(et.ExecutingState == DllLoadState.ExecuteState.Done);
-            Assert.True(et.LatestExecutionResult == DllLoadState.ExecutionResult.Ok);
+            Assert.True(et.ExecutingState == AssemblyLibraryState.ExecuteState.Done);
+            Assert.True(et.LatestExecutionResult == AssemblyLibraryState.ExecutionResult.Ok);
         }
 
         [Fact]
         public void TestDllLoadStateMarkAsFinishedError()
         {
             var t = new TemporaryTask();
-            var et = new DllLoadState(null, t);
+            var et = new AssemblyLibraryState(null, null);
             et.MarkAsFinishedError(DateTime.MinValue);
-            Assert.True(et.ExecutingState == DllLoadState.ExecuteState.Done);
-            Assert.True(et.LatestExecutionResult == DllLoadState.ExecutionResult.Error);
+            Assert.True(et.ExecutingState == AssemblyLibraryState.ExecuteState.Done);
+            Assert.True(et.LatestExecutionResult == AssemblyLibraryState.ExecutionResult.Error);
         }
 
         [Fact]
@@ -53,7 +53,7 @@ namespace SharpTask.Core.Test.SharpTaskExecuterTest
         {
             var dt = new DateTime(2017, 1, 1, 12, 00, 00);
             var t = new TaskOneTimeTrigger201701011200();
-            var et = new DllLoadState(null,t);
+            var et = new AssemblyLibraryState(null,null);
             Assert.True(et.ShouldExecuteNow(dt).ShouldExecuteNow);
             et.MarkAsFinishedOk(dt);
             Assert.False(et.ShouldExecuteNow(dt.AddSeconds(1)).ShouldExecuteNow);
@@ -64,7 +64,7 @@ namespace SharpTask.Core.Test.SharpTaskExecuterTest
         {
             var dt = new DateTime(2017, 1, 1, 12, 00, 00);
             var t = new TaskOneTimeTrigger201701011200();
-            var et = new DllLoadState(null,t);
+            var et = new AssemblyLibraryState(null,null);
             Assert.True(et.ShouldExecuteNow(dt).ShouldExecuteNow);
             et.MarkAsFinishedOk(dt);
             Assert.False(et.ShouldExecuteNow(dt).ShouldExecuteNow);
@@ -75,7 +75,7 @@ namespace SharpTask.Core.Test.SharpTaskExecuterTest
         {
             var dt = new DateTime(2017, 1, 1, 12, 00, 01);
             var t = new TaskOneTimeTrigger201701011200();
-            var et = new DllLoadState(null,t);
+            var et = new AssemblyLibraryState(null,null);
             Assert.True(et.ShouldExecuteNow(dt).ShouldExecuteNow);
         }
 
@@ -84,7 +84,7 @@ namespace SharpTask.Core.Test.SharpTaskExecuterTest
         {
             var dt = new DateTime(2017, 1, 1, 12, 00, 06);
             var t = new TaskOneTimeTrigger201701011200();
-            var et = new DllLoadState(null,t);
+            var et = new AssemblyLibraryState(null,null);
             Assert.False(et.ShouldExecuteNow(dt).ShouldExecuteNow);
         }
 
@@ -93,7 +93,7 @@ namespace SharpTask.Core.Test.SharpTaskExecuterTest
         {
             var dt = new DateTime(2017, 1, 1, 11, 00, 00);
             var t = new TaskOneTimeTrigger201701011200();
-            var et = new DllLoadState(null,t);
+            var et = new AssemblyLibraryState(null,null);
             Assert.False(et.ShouldExecuteNow(dt).ShouldExecuteNow);
         }
 
@@ -103,7 +103,7 @@ namespace SharpTask.Core.Test.SharpTaskExecuterTest
         {
             var dt = new DateTime(2017, 1, 1, 13, 00, 00);
             var t = new TaskOneTimeTrigger201701011200();
-            var et = new DllLoadState(null,t);
+            var et = new AssemblyLibraryState(null,null);
             Assert.False(et.ShouldExecuteNow(dt).ShouldExecuteNow);
         }
     }
