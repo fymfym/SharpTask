@@ -3,8 +3,8 @@ using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
 using SharpTask.Core.Models.Configuration;
+using SharpTask.Core.Models.TaskModule;
 using SharpTask.Core.Repository.TaskModule;
-using SharpTask.Models;
 
 namespace SharpTask.Core.Services.TaskDirectoryManipulation
 {
@@ -68,7 +68,7 @@ namespace SharpTask.Core.Services.TaskDirectoryManipulation
                    file.CreationTime.ToString(CultureInfo.InvariantCulture).GetHashCode();
         }
 
-        public async Task<TaskModuleInformation> CopyTaskFromPickupToRunFolder(TaskModuleInformation taskInformation)
+        public async Task<TaskModuleInformation> MoveTaskFromPickupToRunFolder(TaskModuleInformation taskInformation)
         {
             var dest = new DirectoryInfo(_configuration.TaskRunFolder);
             var newFile = await _taskModuleRepository.CopyFile(new FileInfo(taskInformation.FullFileName), dest);

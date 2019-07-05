@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using SharpTask.Models;
+﻿using SharpTask.Core.Models.Task;
+using SharpTask.Core.Models.TaskModule;
 
 namespace SharpTask.Core.Services.TaskDllLoader
 {
     public interface ITaskDllLoaderService
     {
-        object LoadDll(TaskModuleInformation taskModule);
+        ISharpTask LoadDll(TaskModuleInformation taskModule);
     }
 }

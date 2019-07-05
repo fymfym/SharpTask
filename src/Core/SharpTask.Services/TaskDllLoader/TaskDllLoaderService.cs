@@ -1,19 +1,20 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.Loader;
-using SharpTask.Models;
+using SharpTask.Core.Models.Task;
+using SharpTask.Core.Models.TaskModule;
 
 namespace SharpTask.Core.Services.TaskDllLoader
 {
     public class TaskDllLoaderService : ITaskDllLoaderService
     {
 
-        public object LoadDll(TaskModuleInformation taskModule)
+        public ISharpTask LoadDll(TaskModuleInformation taskModule)
         {
             var myAssembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(taskModule.FullFileName);
-            var myType = myAssembly.GetType("SharpTask.Core.Models.Task.ISharpTask");
+            var myType = myAssembly.GetType("SharpTask.Core.Models.TaskInstance.ISharpTask");
             var myInstance = Activator.CreateInstance(myType);
-            return myInstance;
+            return (ISharpTask)myInstance;
         }
     }
 }

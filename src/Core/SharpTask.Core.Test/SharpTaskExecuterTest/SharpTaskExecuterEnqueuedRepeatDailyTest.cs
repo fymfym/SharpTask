@@ -4,13 +4,13 @@ using Xunit;
 
 namespace SharpTask.Core.Test.SharpTaskExecuterTest
 {
-    public class SharpTaskExecuterEnqueuedRepeatDailyTest
+    public class SharpTaskExecuterDllLoadStateRepeatDailyTest
     {
         [Fact]
         public void TaskRepeatHourly01Test()
         {
             var t = new SharTaskTest.SharpTaskExecuterTest.TestHelpers.TaskRepeatHourly01();
-            var et = new EnquedTask(t);
+            var et = new DllLoadState(null,t);
 
             var dt = new DateTime(2017, 1, 1, 0, 0, 0);
             Assert.False(et.ShouldExecuteNow(dt).ShouldExecuteNow);

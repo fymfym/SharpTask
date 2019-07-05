@@ -1,31 +1,37 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+using System.Threading.Tasks;
 using SharpTask.Core.Models.Task;
 using SharpTask.Core.Services.TaskCollection;
+using SharpTask.Core.Services.TaskDirectoryManipulation;
+using SharpTask.Core.Services.TaskDllLoader;
 
 namespace SharpTask.Core.Services.TaskExecuter
 {
     public class TaskExecuterService : ITaskExecuterService
     {
-        private ILogger<TaskExecuterService> _logger;
+        private readonly ILogger<TaskExecuterService> _logger;
         private readonly ITaskCollectionService _taskCollectionService;
+        private readonly ITaskDllLoaderService _taskDllLoaderService;
+        private readonly ITaskDirectoryManipulationService _taskDirectoryManipulationService;
 
-        Dictionary<Guid, EnquedTask> _enquedTasks;
-        readonly SharpTaskExecuterParameter _parameter;
         bool _running;
-        DateTime _lastDllLoad;
-        Dictionary<string, DllLoadState> _dllLoadedList;
+        Dictionary<long, DllLoadState> _activeTasks;
 
         public TaskExecuterService(
             ILogger<TaskExecuterService> logger,
-            ITaskCollectionService taskCollectionService
+            ITaskCollectionService taskCollectionService,
+            ITaskDllLoaderService taskDllLoaderService,
+            ITaskDirectoryManipulationService taskDirectoryManipulationService
             )
         {
             _logger = logger;
             _taskCollectionService = taskCollectionService;
+            _taskDllLoaderService = taskDllLoaderService;
+            _taskDirectoryManipulationService = taskDirectoryManipulationService;
+
+            _activeTasks = new Dictionary<long, DllLoadState>();
         }
 
         public void Start()
@@ -35,14 +41,67 @@ namespace SharpTask.Core.Services.TaskExecuter
 
             while (_running)
             {
-                _taskCollectionService.SynchronizeDirectories();
 
-                var tasks = _taskCollectionService.GetRunnableTask();
+                var closableTasksTask = _taskCollectionService.GetClosableTask();
+                var runnableTasksTask = _taskCollectionService.GetRunnableTask();
+                var newTasksTask = _taskCollectionService.GetNewTask();
+                Task.WaitAll(closableTasksTask,runnableTasksTask, newTasksTask);
+                var closableTasks = closableTasksTask.Result;
+                var runnableTasks = runnableTasksTask.Result;
+                var newTasks = newTasksTask.Result;
+
+                foreach (var task in closableTasks)
+                {
+                    if (_activeTasks.ContainsKey(task.Hash))
+                    {
+                        _logger.LogInformation("{@action}{@task}",
+                            "Removing task",
+                            task.FullFileName);
+                        _activeTasks[task.Hash].DisposeInstance();
+                        _activeTasks.Remove(task.Hash);
+                        _taskDirectoryManipulationService.MoveTaskFromRunToUnloadFolder(task);
+                    }
+                }
+
+                foreach (var task in newTasks)
+                {
+                    if (_activeTasks.ContainsKey(task.Hash)) continue;
+                    _logger.LogInformation("{@action}{@task}",
+                        "Adding tasks from pickup folder",
+                        task.FullFileName);
+
+
+                    ISharpTask taskInstance;
+                    try
+                    {
+                        _logger.LogInformation("{@action}{@task}",
+                            "Instanciate task",
+                            task.FullFileName);
+                        taskInstance = _taskDllLoaderService.LoadDll(task);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning("{@action}{@taskfile}{@exception}",
+                            "TaskInstance not loaded",
+                            task.FullFileName,
+                            ex.ToString());
+                        _taskDirectoryManipulationService.MoveTaskFromPickupToErrorFolder(task);
+                        continue;
+                    }
+
+                    _activeTasks.Add(task.Hash, new DllLoadState(task, taskInstance));
+
+                    _logger.LogInformation("{@action}{@task}",
+                        "TaskInstance instance added",
+                        task.FullFileName);
+                    _taskDirectoryManipulationService.MoveTaskFromPickupToRunFolder(task);
+                }
+
+                foreach (var taskModuleInformation in runnableTasks)
+                {
+                    
+                }
             }
-            
-            _dllLoadedList = new Dictionary<string, DllLoadState>();
-            UpdateEnquedTasks();
-            ExecuteEnqueuedTasks();
         }
 
         public void Stop()
@@ -50,12 +109,12 @@ namespace SharpTask.Core.Services.TaskExecuter
             _running = false;
         }
 
-        public void ExecuteEnqueuedTasks()
+        public void ExecuteDllLoadStateTasks()
         {
             _logger.LogInformation("Waiting for enqued tasks start trigger...");
             while (_running)
             {
-                foreach (var task in _enquedTasks)
+                foreach (var task in _activeTasks)
                 {
                     var now = DateTime.Now;
                     var res = task.Value.ShouldExecuteNow(now);
@@ -71,9 +130,9 @@ namespace SharpTask.Core.Services.TaskExecuter
                 System.Threading.Thread.Sleep(1000);
 
 
-                if (new TimeSpan(DateTime.Now.Ticks - _lastDllLoad.Ticks).TotalSeconds > 30)
+//                if (new TimeSpan(DateTime.Now.Ticks - _lastDllLoad.Ticks).TotalSeconds > 30)
                 {
-                    UpdateEnquedTasks();
+                    //UpdateEnquedTasks();
                 }
             }
             _logger.LogInformation("Enqued tasks stopped!");
@@ -81,138 +140,25 @@ namespace SharpTask.Core.Services.TaskExecuter
 
         void _runTask(object taskToRunObject)
         {
-            EnquedTask taskToRun = (EnquedTask)taskToRunObject;
-            _logger.LogInformation("Starting task: {0}", taskToRun.Task.GetType());
+            DllLoadState taskToRun = (DllLoadState)taskToRunObject;
+            _logger.LogInformation("Starting task: {0}", taskToRun.TaskInstance.GetType());
 
-            var result = taskToRun.Task.RunTask(taskToRun.Parameters);
+            var result = taskToRun.TaskInstance.RunTask(taskToRun.Parameters);
             if (result.TaskFinished)
             {
                 if (result.Sucessfull)
                 {
                     taskToRun.MarkAsFinishedOk(DateTime.Now);
-                    _logger.LogInformation("Finished OK: {0}", taskToRun.Task.GetType());
+                    _logger.LogInformation("Finished OK: {0}", taskToRun.TaskInstance.GetType());
                 }
                 else
                 {
                     taskToRun.MarkAsFinishedError(DateTime.Now);
-                    _logger.LogInformation("Finished with error: {0}", taskToRun.Task.GetType());
+                    _logger.LogInformation("Finished with error: {0}", taskToRun.TaskInstance.GetType());
                 }
             }
         }
 
-        void UpdateEnquedTasks()
-        {
-            _logger.LogInformation("Loading tasks...");
-            if (_enquedTasks == null) _enquedTasks = new Dictionary<Guid, EnquedTask>();
-
-            DllLoadState dllLoadState = null;
-
-            foreach (var item in _dllLoadedList)
-                item.Value.FilePresenceConfirmed = false;
-
-            try
-            {
-                if (!System.IO.Directory.Exists(_parameter.TaskLibrary)) System.IO.Directory.CreateDirectory(_parameter.TaskLibrary);
-
-                var path = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), _parameter.TaskLibrary);
-                if (System.IO.Directory.Exists(path))
-                {
-                    _logger.LogInformation("Task .dll directoryu: {0}", path);
-                    var dllFileList = System.IO.Directory.GetFiles(path, "*.dll");
-
-                    foreach (var file in dllFileList)
-                    {
-                        _logger.LogInformation("Investigating file: {0}", System.IO.Path.GetFileName(file));
-
-                        if (!_dllLoadedList.ContainsKey(file))
-                        {
-                            dllLoadState = new DllLoadState()
-                            {
-                                DllName = file,
-                                DllFileName = file,
-                                FilePresenceConfirmed = true
-                            };
-                        }
-                        else
-                        {
-                            dllLoadState = _dllLoadedList[file];
-                            dllLoadState.FilePresenceConfirmed = true;
-                        }
-
-                        var res = _dllLoadedList.Count(x => (x.Value.DllName == file) && (x.Value.LoadError));
-                        if (res > 0) continue;
-
-                        var dll = Assembly.LoadFile(file);
-
-                        foreach (Type dlltype in dll.GetExportedTypes())
-                        {
-                            var loadedTaskType = dlltype.GetTypeInfo();
-
-                            var ilist = loadedTaskType.ImplementedInterfaces;
-
-                            if (ilist.Count(z => z.Name.ToLower().Contains("sharptaskinterface")) < 1) continue;
-
-                            var sh = (ISharpTask)Activator.CreateInstance(dlltype);
-
-                            EnquedTask et = new EnquedTask(sh);
-                            if (!_enquedTasks.ContainsKey(loadedTaskType.GUID))
-                            {
-                                _enquedTasks.Add(loadedTaskType.GUID, et);
-                                _logger.LogInformation("  Task added: {0} / {1}", loadedTaskType.GUID.ToString(), loadedTaskType);
-                                foreach (var tt in sh.RunTrigger)
-                                {
-                                    var name = tt.Name ?? "Unnamed";
-                                    var vtd = tt.TriggerDate.ToString();
-                                    var vtt = tt.TriggerTime?.ToString() ?? "";
-                                    _logger.LogDebug("    Trigger: {0} / {1} {2}", name, vtd, vtt);
-                                    dllLoadState.ConfirmedLoaded = true;
-                                }
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    _logger.LogWarning("Task .dll directory can not be found: {0}", path);
-                }
-
-                _lastDllLoad = DateTime.Now;
-
-            }
-            catch (Exception ex)
-            {
-                dllLoadState.LoadError = true;
-                if (!_dllLoadedList.ContainsKey(dllLoadState.DllName))
-                {
-                    _dllLoadedList.Add(dllLoadState.DllName, dllLoadState);
-                }
-                _logger.LogWarning("Could not load task .DLL file: {0}", dllLoadState.DllFileName);
-                _logger.LogWarning("Loading .DLL failes",ex);
-            }
-
-            _logger.LogInformation("Task loaded: ");
-            foreach (var item in _dllLoadedList.Where(x => !x.Value.ConfirmedLoaded && !x.Value.ReportedToGui))
-            {
-                _logger.LogInformation("  {0}", item.Value.DllName);
-                item.Value.ReportedToGui = true;
-            }
-
-            _logger.LogInformation("Task unloaded:");
-            foreach (var item in _dllLoadedList.Where(x => !x.Value.LoadError && !x.Value.ReportedToGui))
-            {
-                _logger.LogInformation("  {0}", item.Value.DllName);
-                item.Value.ReportedToGui = true;
-            }
-
-            _logger.LogInformation("DLL files removed:");
-            var filelist = _dllLoadedList.Where(x => !x.Value.FilePresenceConfirmed).ToList();
-            foreach(var item in filelist)
-            {
-                _dllLoadedList.Remove(item.Value.DllName);
-                _logger.LogInformation("  {0}", item.Value.DllName);
-            }
-
-        }
     }
 
 }

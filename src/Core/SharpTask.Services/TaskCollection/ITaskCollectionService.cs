@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using SharpTask.Core.Models.TaskModule;
 
 namespace SharpTask.Core.Services.TaskCollection
 {
@@ -9,8 +10,8 @@ namespace SharpTask.Core.Services.TaskCollection
     /// 
     public interface ITaskCollectionService
     {
-        Task<IEnumerator<object>> GetRunnableTask();
-
-        Task<IEnumerator<object>> SynchronizeDirectories();
+        Task<IEnumerable<TaskModuleInformation>> GetRunnableTask();
+        Task<IEnumerable<TaskModuleInformation>> GetClosableTask();
+        Task<IEnumerable<TaskModuleInformation>> GetNewTask();
     }
 }
