@@ -9,6 +9,7 @@ using SharpTask.Core.Models.TaskModule;
 using SharpTask.Core.Services.TaskCollection;
 using SharpTask.Core.Services.TaskDirectoryManipulation;
 using SharpTask.Core.Services.TaskDllLoader;
+using SharpTask.Core.Services.TaskExecution;
 
 namespace SharpTask.Core.Services.TaskExecuter
 {
@@ -18,8 +19,10 @@ namespace SharpTask.Core.Services.TaskExecuter
         private readonly IAssemblyCollectionService _assemblyCollectionService;
         private readonly ITaskDllLoaderService _taskDllLoaderService;
         private readonly ITaskDirectoryManipulationService _taskDirectoryManipulationService;
+        private readonly ITaskExecutionService _taskExecutionService;
 
         bool _running;
+
         // ReSharper disable once FieldCanBeMadeReadOnly.Local
         private Dictionary<long, AssemblyInformation> _activeAssemblies;
         // ReSharper disable once FieldCanBeMadeReadOnly.Local
@@ -31,13 +34,15 @@ namespace SharpTask.Core.Services.TaskExecuter
             ILogger<TaskExecuterService> logger,
             IAssemblyCollectionService assemblyCollectionService,
             ITaskDllLoaderService taskDllLoaderService,
-            ITaskDirectoryManipulationService taskDirectoryManipulationService
+            ITaskDirectoryManipulationService taskDirectoryManipulationService,
+            ITaskExecutionService taskExecutionService
             )
         {
             _logger = logger;
             _assemblyCollectionService = assemblyCollectionService;
             _taskDllLoaderService = taskDllLoaderService;
             _taskDirectoryManipulationService = taskDirectoryManipulationService;
+            _taskExecutionService = taskExecutionService;
 
             _activeAssemblies = new Dictionary<long, AssemblyInformation>();
             _activeTaskClasses = new Dictionary<long, TaskClassState>();
@@ -165,7 +170,8 @@ namespace SharpTask.Core.Services.TaskExecuter
         {
             foreach (var sharpTaskClassInformation in _activeTaskClasses)
             {
-                var executeResult = sharpTaskClassInformation.Value.ShouldExecuteNow(DateTime.Now);
+                var executeResult = _taskExecutionService.ShouldExecuteNow(sharpTaskClassInformation.Value, DateTime.Now);
+
 
                 if (executeResult.ShouldExecuteNow)
                 {
@@ -174,42 +180,44 @@ namespace SharpTask.Core.Services.TaskExecuter
                         sharpTaskClassInformation.Value.GetType(),
                         executeResult.UsedTrigger.GetType());
 
-                    sharpTaskClassInformation.Value.MarkAsStarted(DateTime.Now);
+                    _taskExecutionService.MarkAsStarted(sharpTaskClassInformation.Value,DateTime.Now);
                     System.Threading.Thread runTask = new System.Threading.Thread(RunTask);
-                    runTask.Start(sharpTaskClassInformation.Value);
+                    runTask.Start(sharpTaskClassInformation);
                 }
             }
         }
 
         public void RunTask(object task)
         {
-            var sharpTask = task as ISharpTask;
+            var sharpTask = task as TaskClassState;
             if (sharpTask == null) return;
 
             _logger.LogInformation("{@action}{@class}{@name}{@description}",
                 "Starting execution on seperate thread",
                 sharpTask.GetType(),
-                sharpTask.Name,
-                sharpTask.Description);
+                sharpTask.SharpTask.Name,
+                sharpTask.SharpTask.Description);
 
             try
             {
-                var result = sharpTask.RunTask(null);
+                var result = sharpTask.SharpTask.RunTask(null);
 
                 _logger.LogInformation("{@action}{@class}{@name}{@description}{@Successful}{@TaskFinished}",
                     "Execution ended",
                     sharpTask.GetType(),
-                    sharpTask.Name,
-                    sharpTask.Description,
+                    sharpTask.SharpTask.Name,
+                    sharpTask.SharpTask.Description,
                     result.Successful,
                     result.TaskFinished);
+
+                _taskExecutionService.MarkAsFinishedOk(sharpTask,DateTime.Now);
 
                 foreach (var log in result.LogLines)
                 {
                     _logger.LogInformation("{@action}{@class}{@name}{@log}",
                         "Class log line",
                         sharpTask.GetType(),
-                        sharpTask.Name,
+                        sharpTask.SharpTask.Name,
                         log);
                 }
             }
@@ -218,9 +226,10 @@ namespace SharpTask.Core.Services.TaskExecuter
                 _logger.LogWarning("{@action}{@class}{@name}{@description}{@excpetion}",
                     "Execution of tasl fails",
                     sharpTask.GetType(),
-                    sharpTask.Name,
-                    sharpTask.Description,
+                    sharpTask.SharpTask.Name,
+                    sharpTask.SharpTask.Description,
                     ex.ToString());
+                _taskExecutionService.MarkAsFinishedError(sharpTask,DateTime.Now);
 
             }
         }
