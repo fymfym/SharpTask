@@ -1,4 +1,5 @@
 ﻿using System;
+// ReSharper disable RedundantStringInterpolation
 
 namespace SharpTask.Core.Models.Task
 {
@@ -32,8 +33,8 @@ namespace SharpTask.Core.Models.Task
             get => _year;
             set
             {
-                if (value < 0) throw new ArgumentOutOfRangeException($@"Year must be beyween 0 and 9999");
-                if (value > 9990) throw new ArgumentOutOfRangeException($@"Year must be beyween 0 and 9999");
+                if (value < 0) throw new ArgumentOutOfRangeException($"Year must be beyween 0 and 9999");
+                if (value > 9990) throw new ArgumentOutOfRangeException($"Year must be beyween 0 and 9999");
                 _year = value;
             }
         }

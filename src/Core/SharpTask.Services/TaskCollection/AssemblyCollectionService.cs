@@ -7,13 +7,13 @@ using SharpTask.Core.Services.TaskDirectoryManipulation;
 
 namespace SharpTask.Core.Services.TaskCollection
 {
-    public class TaskCollectionService : ITaskCollectionService
+    public class AssemblyCollectionService : IAssemblyCollectionService
     {
-        private readonly ILogger<TaskCollectionService> _logger;
+        private readonly ILogger<AssemblyCollectionService> _logger;
         private readonly ITaskDirectoryManipulationService _taskDirectoryManipulationService;
 
-        public TaskCollectionService(
-            ILogger<TaskCollectionService> logger,
+        public AssemblyCollectionService(
+            ILogger<AssemblyCollectionService> logger,
             ITaskDirectoryManipulationService taskDirectoryManipulationService
             )
         {
@@ -21,16 +21,16 @@ namespace SharpTask.Core.Services.TaskCollection
             _taskDirectoryManipulationService = taskDirectoryManipulationService;
         }
 
-        public async Task<IEnumerable<TaskModuleInformation>> GetRunnableTask()
+        public async Task<IEnumerable<AssemblyInformation>> GetRunnableAssemblies()
         {
-            _logger.LogInformation("GetRunnableTask");
+            _logger.LogInformation("GetRunnableAssemblies");
             var runnableTasks = _taskDirectoryManipulationService.GetTasksInRunFolder();
             return await Task.Run(() => runnableTasks);
         }
 
-        public async Task<IEnumerable<TaskModuleInformation>> GetUnloadbleTask()
+        public async Task<IEnumerable<AssemblyInformation>> GetUnloadableAssemblies()
         {
-            _logger.LogInformation("GetUnloadbleTask");
+            _logger.LogInformation("GetUnloadableAssemblies");
             var runnableTasks = _taskDirectoryManipulationService.GetTasksInRunFolder();
             var pickupTasks = _taskDirectoryManipulationService.GetTasksInPickupFolder();
 
@@ -39,9 +39,9 @@ namespace SharpTask.Core.Services.TaskCollection
             return await Task.Run(() => closable);
         }
 
-        public async Task<IEnumerable<TaskModuleInformation>> GetNewTask()
+        public async Task<IEnumerable<AssemblyInformation>> GetNewAssemblies()
         {
-            _logger.LogInformation("GetNewTask");
+            _logger.LogInformation("GetNewAssemblies");
             var runnableTasks = _taskDirectoryManipulationService.GetTasksInRunFolder();
             var pickupTasks = _taskDirectoryManipulationService.GetTasksInPickupFolder();
 

@@ -8,10 +8,10 @@ namespace SharpTask.Core.Services.TaskCollection
     /// Manipulates the directories and move module files around, using appropriate related services
     /// </summary>
     /// 
-    public interface ITaskCollectionService
+    public interface IAssemblyCollectionService
     {
-        Task<IEnumerable<TaskModuleInformation>> GetRunnableTask();
-        Task<IEnumerable<TaskModuleInformation>> GetUnloadbleTask();
-        Task<IEnumerable<TaskModuleInformation>> GetNewTask();
+        Task<IEnumerable<AssemblyInformation>> GetRunnableAssemblies();
+        Task<IEnumerable<AssemblyInformation>> GetUnloadableAssemblies();
+        Task<IEnumerable<AssemblyInformation>> GetNewAssemblies();
     }
 }

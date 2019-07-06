@@ -12,13 +12,13 @@ namespace SharpTask.Core.Models.Task
             TaskLibrary = ".";
         }
 
-        static string GetParameterValue(List<string> keyValueList, string name, string defaultVaue)
+        static string GetParameterValue(List<string> keyValueList, string name, string defaultValue)
         {
             var idx = keyValueList.IndexOf(name);
             if (idx >= 0)
                 if (keyValueList.Count >= idx + 1)
                     return keyValueList[idx + 1];
-            return defaultVaue;
+            return defaultValue;
         }
 
         public static SharpTaskExecuterParameter ParseArgs(string[] args)

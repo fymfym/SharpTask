@@ -6,14 +6,14 @@ namespace SharpTask.Core.Models.Task
     {
         public List<string> LogLines;
 
-        public bool Sucessfull { get; }
+        public bool Successful { get; }
 
         public bool TaskFinished { get; }
 
-        public RunResult(bool taskComplete, bool sucessfull)
+        public RunResult(bool taskComplete, bool successful)
         {
             TaskFinished = taskComplete;
-            Sucessfull = sucessfull;
+            Successful = successful;
             LogLines = new List<string>();
         }
     }

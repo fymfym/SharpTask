@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SharpTask.Core.Services.TaskExecuter
+﻿namespace SharpTask.Core.Services.TaskExecuter
 {
     public interface ITaskExecuterService
     {

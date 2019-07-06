@@ -2,7 +2,7 @@
 using SharpTask.Core.Models.Schedule;
 using SharpTask.Core.Models.Task;
 
-namespace SharTaskTest.SharpTaskExecuterTest.TestHelpers
+namespace SharpTask.Core.Test.SharpTaskExecuterTest.TestHelpers
 {
     public class TaskRepeatHourly01 : ISharpTask
     {

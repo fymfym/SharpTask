@@ -7,7 +7,7 @@ namespace SharpTask.Core.Models.Schedule
 {
     public class TriggerRepeatDaily : ITriggerInterface
     {
-        readonly List<DayOfWeek> _daysTorun;
+        readonly List<DayOfWeek> _daysToRun;
         readonly StTime _startTime;
 
         public int Sequence { get; set; }
@@ -20,9 +20,9 @@ namespace SharpTask.Core.Models.Schedule
 
         public StTime TriggerTime { get; set; }
 
-        public TriggerRepeatDaily(StDate startDate, List<DayOfWeek> daysTorun, StTime startTime)
+        public TriggerRepeatDaily(StDate startDate, List<DayOfWeek> daysToRun, StTime startTime)
         {
-            _daysTorun = daysTorun;
+            _daysToRun = daysToRun;
             TriggerDate = startDate;
             _startTime = startTime;
         }
@@ -31,7 +31,7 @@ namespace SharpTask.Core.Models.Schedule
         {
 
             var day = currentTime.DayOfWeek;
-            if (_daysTorun.Count(x => x == day) < 1) return false;
+            if (_daysToRun.Count(x => x == day) < 1) return false;
 
             var ts = new TimeSpan(Helpers.GetTimeOnly(currentTime).Ticks - _startTime.Ticks).TotalSeconds;
             if ((ts >= 0) && (ts <= 5)) return true;

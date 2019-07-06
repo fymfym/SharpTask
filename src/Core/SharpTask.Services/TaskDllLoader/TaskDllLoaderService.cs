@@ -11,9 +11,9 @@ namespace SharpTask.Core.Services.TaskDllLoader
     public class TaskDllLoaderService : ITaskDllLoaderService
     {
 
-        public Assembly LoadAssembly(TaskModuleInformation taskModule)
+        public Assembly LoadAssembly(AssemblyInformation assembly)
         {
-            var myAssembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(taskModule.FullFileName);
+            var myAssembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(assembly.FullFileName);
 
             var types = myAssembly.ExportedTypes;
             var classes = types.Where(x => x.IsClass).ToList();

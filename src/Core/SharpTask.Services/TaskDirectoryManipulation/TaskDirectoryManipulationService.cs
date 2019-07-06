@@ -27,19 +27,19 @@ namespace SharpTask.Core.Services.TaskDirectoryManipulation
             _logger = logger;
         }
 
-        public IEnumerable<TaskModuleInformation> GetTasksInPickupFolder()
+        public IEnumerable<AssemblyInformation> GetTasksInPickupFolder()
         {
             return GetFiles(_configuration.TaskPickupFolder);
         }
 
-        public IEnumerable<TaskModuleInformation> GetTasksInRunFolder()
+        public IEnumerable<AssemblyInformation> GetTasksInRunFolder()
         {
             return GetFiles(_configuration.TaskRunFolder);
         }
 
-        private IEnumerable<TaskModuleInformation> GetFiles(string directory)
+        private IEnumerable<AssemblyInformation> GetFiles(string directory)
         {
-            var result = new List<TaskModuleInformation>();
+            var result = new List<AssemblyInformation>();
 
 
             var dirInfo = new DirectoryInfo(directory);
@@ -56,9 +56,9 @@ namespace SharpTask.Core.Services.TaskDirectoryManipulation
             return result;
         }
 
-        private TaskModuleInformation GenerateTaskModuleInformation(FileInfo fileInfo)
+        private AssemblyInformation GenerateTaskModuleInformation(FileInfo fileInfo)
         {
-            return new TaskModuleInformation()
+            return new AssemblyInformation()
             {
                 FullFileName = fileInfo.FullName,
                 Hash = GetFileHashCode(fileInfo)
@@ -72,7 +72,7 @@ namespace SharpTask.Core.Services.TaskDirectoryManipulation
                    file.CreationTime.ToString(CultureInfo.InvariantCulture).GetHashCode();
         }
 
-        public async Task<TaskModuleInformation> CopyTaskFromPickupToRunFolder(TaskModuleInformation taskInformation)
+        public async Task<AssemblyInformation> CopyTaskFromPickupToRunFolder(AssemblyInformation taskInformation)
         {
             var dest = new DirectoryInfo(_configuration.TaskRunFolder);
             var newFile = await _taskModuleRepository.CopyFile(new FileInfo(taskInformation.FullFileName), dest);
@@ -86,7 +86,7 @@ namespace SharpTask.Core.Services.TaskDirectoryManipulation
             return res;
         }
 
-        public async Task<TaskModuleInformation> MoveTaskFromPickupToErrorFolder(TaskModuleInformation taskInformation)
+        public async Task<AssemblyInformation> MoveTaskFromPickupToErrorFolder(AssemblyInformation taskInformation)
         {
             var dest = new DirectoryInfo(_configuration.TaskLoadErrorFolder);
             var newFile = await _taskModuleRepository.MoveFile(new FileInfo(taskInformation.FullFileName), dest);
@@ -100,7 +100,7 @@ namespace SharpTask.Core.Services.TaskDirectoryManipulation
             return res;
         }
 
-        public async  Task<TaskModuleInformation> MoveTaskFromRunToUnloadFolder(TaskModuleInformation taskInformation)
+        public async  Task<AssemblyInformation> MoveTaskFromRunToUnloadFolder(AssemblyInformation taskInformation)
         {
 
             var dest = new DirectoryInfo(_configuration.TaskUnloadFolder);

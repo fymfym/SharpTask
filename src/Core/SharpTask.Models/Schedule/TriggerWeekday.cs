@@ -17,10 +17,10 @@ namespace SharpTask.Core.Models.Schedule
 
         }
 
-        public TriggerWeekday(StDate startdate, StTime executeTime, List<DayOfWeek> weekdayList)
+        public TriggerWeekday(StDate startDate, StTime executeTime, List<DayOfWeek> weekdayList)
         {
             _weekdayList = weekdayList;
-            TriggerDate = startdate;
+            TriggerDate = startDate;
             TriggerTime = executeTime;
         }
 

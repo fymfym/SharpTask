@@ -1,23 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using SharpTask.Core.Models.TaskModule;
 
 namespace SharpTask.Core.Models.Task
 {
-    public class AssemblyLibraryState
+    public class TaskClassState
     {
-        // private static readonly ILog Log = LogManager.GetLogger(typeof(AssemblyLibraryState));
+        // private static readonly ILog Log = LogManager.GetLogger(typeof(TaskClassState));
 
         private readonly object _lockObject = new object();
-        private Assembly _taskAssembly;
         private DateTime _lastExecuteStart;
         private DateTime _lastExecuteFinished;
 
+        public AssemblyInformation AssemblyInformation { get; set; }
+        private ISharpTask _sharpTask;
 
         public long DllHash;
 
-        public TaskModuleInformation TaskInformation;
+        public AssemblyInformation TaskInformation;
 
         public TaskParameters Parameters;
         public enum ExecutionResult { NotSet, Ok, Error };
@@ -25,22 +25,20 @@ namespace SharpTask.Core.Models.Task
 
         public readonly Dictionary<long,DateTime> PastExecutions;
 
-        public void DisposeAssembly()
+        public void DisposeClass()
         {
-            _taskAssembly = null;
+            _sharpTask = null;
         }
 
         public ExecuteState ExecutingState { get; private set; }
 
         public ExecutionResult LatestExecutionResult { get; private set; }
 
-        public AssemblyLibraryState(TaskModuleInformation taskInformation, Assembly assembly)
+        public TaskClassState(AssemblyInformation taskInformation, ISharpTask sharpTask)
         {
-            _taskAssembly = assembly ?? throw new Exception("TaskAssembly not set correct");
+            _sharpTask = sharpTask ?? throw new Exception("ISharpTask empty/null");
             PastExecutions = new Dictionary<long, DateTime>();
         }
-
-        public Assembly TaskAssembly => _taskAssembly;
 
         public void MarkAsStarted(DateTime currentTime)
         {
@@ -76,31 +74,31 @@ namespace SharpTask.Core.Models.Task
         public ShouldExecuteResult ShouldExecuteNow(DateTime currentTime)
         {
             ShouldExecuteResult res = new ShouldExecuteResult();
-            //foreach (var tt in TaskAssembly.)
-            //{
-            //    if (tt.ShouldRunNow(currentTime))
-            //    {
-            //        bool run = true;
-            //        if ((_lastExecuteFinished > DateTime.MinValue) || (_lastExecuteStart > DateTime.MinValue))
-            //        {
-            //            var ts = new TimeSpan(_lastExecuteFinished.Ticks - currentTime.Ticks).TotalSeconds;
-            //            if ((ts <= 0) && (ts >= -120)) run = false;
-            //            if (_lastExecuteStart.Ticks > 0)
-            //            {
-            //                ts = new TimeSpan(_lastExecuteStart.Ticks - currentTime.Ticks).TotalSeconds;
-            //                if (ts <= 0) run = false;
-            //            }
-            //        }
+            foreach (var tt in _sharpTask.RunTrigger)
+            {
+                if (tt.ShouldRunNow(currentTime))
+                {
+                    bool run = true;
+                    if ((_lastExecuteFinished > DateTime.MinValue) || (_lastExecuteStart > DateTime.MinValue))
+                    {
+                        var ts = new TimeSpan(_lastExecuteFinished.Ticks - currentTime.Ticks).TotalSeconds;
+                        if ((ts <= 0) && (ts >= -120)) run = false;
+                        if (_lastExecuteStart.Ticks > 0)
+                        {
+                            ts = new TimeSpan(_lastExecuteStart.Ticks - currentTime.Ticks).TotalSeconds;
+                            if (ts <= 0) run = false;
+                        }
+                    }
 
-            //        if (run)
-            //        {
-            //            PastExecutions.Add(tt.GetHashCode(), currentTime);
-            //            res.ShouldExecuteNow = true;
-            //            res.UsedTrigger = tt;
-            //            return res;
-            //        }
-            //    }
-            //}
+                    if (run)
+                    {
+                        PastExecutions.Add(tt.GetHashCode(), currentTime);
+                        res.ShouldExecuteNow = true;
+                        res.UsedTrigger = tt;
+                        return res;
+                    }
+                }
+            }
             return res;
         }
     }

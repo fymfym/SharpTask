@@ -1,5 +1,6 @@
 ﻿using System;
 using SharpTask.Core.Models.Task;
+using SharpTask.Core.Test.SharpTaskExecuterTest.TestHelpers;
 using Xunit;
 
 namespace SharpTask.Core.Test.SharpTaskExecuterTest
@@ -9,8 +10,8 @@ namespace SharpTask.Core.Test.SharpTaskExecuterTest
         [Fact]
         public void TaskRepeatHourly01Test()
         {
-            var t = new SharTaskTest.SharpTaskExecuterTest.TestHelpers.TaskRepeatHourly01();
-            var et = new AssemblyLibraryState(null,null);
+            var t = new TaskRepeatHourly01();
+            var et = new TaskClassState(null,t);
 
             var dt = new DateTime(2017, 1, 1, 0, 0, 0);
             Assert.False(et.ShouldExecuteNow(dt).ShouldExecuteNow);

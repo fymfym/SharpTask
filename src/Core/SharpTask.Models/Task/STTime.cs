@@ -1,4 +1,6 @@
 ﻿using System;
+// ReSharper disable NotResolvedInText
+// ReSharper disable RedundantStringInterpolation
 
 namespace SharpTask.Core.Models.Task
 {
@@ -8,10 +10,6 @@ namespace SharpTask.Core.Models.Task
         int _minute;
         int _second;
 
-        public StTime()
-        {
-            throw new Exception("");
-        }
         public StTime(int hour, int minute, int second)
         {
             Hour = hour;
@@ -24,19 +22,19 @@ namespace SharpTask.Core.Models.Task
             return DateTimeObject.ToString("HH:mm:ss");
         }
 
-        public StTime(DateTime dateTimeVaue)
+        public StTime(DateTime dateTimeValue)
         {
-            Hour = dateTimeVaue.Hour;
-            Minute = dateTimeVaue.Minute;
-            Second = dateTimeVaue.Second;
+            Hour = dateTimeValue.Hour;
+            Minute = dateTimeValue.Minute;
+            Second = dateTimeValue.Second;
         }
         public int Hour
         {
             get => _hour;
             set
             {
-                if (value < 0) throw new ArgumentOutOfRangeException($"Hour must be between 0 and 23");
-                if (value > 23) throw new ArgumentOutOfRangeException($"Hour must be between 0 and 23");
+                if (value < 0) throw new ArgumentOutOfRangeException("Hour must be between 0 and 23");
+                if (value > 23) throw new ArgumentOutOfRangeException("Hour must be between 0 and 23");
                 _hour = value;
             }
         }

@@ -1,6 +1,6 @@
 ﻿namespace SharpTask.Core.Models.TaskModule
 {
-    public class TaskModuleInformation
+    public class AssemblyInformation
     {
         public string TaskName;
         public string FullFileName;

@@ -5,6 +5,6 @@ namespace SharpTask.Core.Services.TaskDllLoader
 {
     public interface ITaskDllLoaderService
     {
-        Assembly LoadAssembly(TaskModuleInformation taskModule);
+        Assembly LoadAssembly(AssemblyInformation assembly);
     }
 }

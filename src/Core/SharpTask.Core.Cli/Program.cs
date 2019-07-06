@@ -82,7 +82,7 @@ namespace SharpTask.Core.Cli
             serviceCollection.AddTransient<ITaskDllLoaderService,TaskDllLoaderService>();
             serviceCollection.AddTransient<ITaskModuleRepository,TaskModuleRepository>();
             serviceCollection.AddTransient<ITaskExecuterService,TaskExecuterService>();
-            serviceCollection.AddTransient<ITaskCollectionService,TaskCollectionService>();
+            serviceCollection.AddTransient<IAssemblyCollectionService,AssemblyCollectionService>();
             serviceCollection.AddTransient<ITaskDirectoryManipulationService,TaskDirectoryManipulationService>();
             
         }
