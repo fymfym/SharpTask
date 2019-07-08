@@ -8,11 +8,13 @@ using Microsoft.Extensions.Logging;
 using NLog;
 using NLog.Web;
 using SharpTask.Core.Cli.Extensions;
+using SharpTask.Core.Repository.TaskExecution;
 using SharpTask.Core.Repository.TaskModule;
-using SharpTask.Core.Services.TaskCollection;
+using SharpTask.Core.Services.TaskDirectoryFileService;
 using SharpTask.Core.Services.TaskDirectoryManipulation;
 using SharpTask.Core.Services.TaskDllLoader;
 using SharpTask.Core.Services.TaskExecuter;
+using SharpTask.Core.Services.TaskExecution;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace SharpTask.Core.Cli
@@ -75,17 +77,17 @@ namespace SharpTask.Core.Cli
 
         private static void BuildServiceCollection(
             IServiceCollection serviceCollection
-            )
+        )
         {
             //serviceCollection.AddHttpClient<SomeHttpClient>();
 
-            serviceCollection.AddTransient<ITaskDllLoaderService,TaskDllLoaderService>();
-            serviceCollection.AddTransient<ITaskModuleRepository,TaskModuleRepository>();
-            serviceCollection.AddTransient<ITaskExecuterService,TaskExecuterService>();
-            serviceCollection.AddTransient<IAssemblyCollectionService,AssemblyCollectionService>();
-            serviceCollection.AddTransient<ITaskDirectoryManipulationService,TaskDirectoryManipulationService>();
-            
+            serviceCollection.AddTransient<ITaskDllLoaderService, TaskDllLoaderService>();
+            serviceCollection.AddTransient<ITaskModuleRepository, TaskModuleRepository>();
+            serviceCollection.AddTransient<ITaskExecuterService, TaskExecuterService>();
+            serviceCollection.AddTransient<IAssemblyCollectionService, TaskDirectoryFileService>();
+            serviceCollection.AddTransient<ITaskDirectoryManipulationService, TaskDirectoryManipulationService>();
+            serviceCollection.AddTransient<ITaskExecutionService, TaskExecutionService>();
+            serviceCollection.AddTransient<ITaskExecutionRepository, TaskExecutionRepository>();
         }
-
     }
 }

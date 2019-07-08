@@ -7,25 +7,16 @@ namespace SharpTask.Core.SampleTask
 {
     public class SharpTaskSampleTask : ISharpTask
     {
-        List<ITriggerInterface> _triggerList;
 
-        private void CreateTriggerList()
+        private List<ITriggerInterface> CreateTriggerList()
         {
             var now = DateTime.Now.AddSeconds(5);
-            _triggerList = new List<ITriggerInterface>
+            return new List<ITriggerInterface>
             {
-                new TriggerOneTime(new StDate(now), new StTime(now)) { Name = "+05 sec" }
+                new TriggerOneTime(new StDate(now), new StTime(now)) { Name = "Now +05 sec" }
             };
         }
 
-        public List<ITriggerInterface> RunTrigger
-        {
-            get
-            {
-                if (_triggerList == null) CreateTriggerList();
-                return _triggerList;
-            }
-        }
 
         public string Name => "Sample task";
 
@@ -33,7 +24,7 @@ namespace SharpTask.Core.SampleTask
 
         public string Owner => "Sample task owner";
 
-        List<ITriggerInterface> ISharpTask.RunTrigger => throw new NotImplementedException();
+        List<ITriggerInterface> ISharpTask.RunTrigger => CreateTriggerList();
 
         public RunResult RunTask(TaskParameters taskParameters)
         {

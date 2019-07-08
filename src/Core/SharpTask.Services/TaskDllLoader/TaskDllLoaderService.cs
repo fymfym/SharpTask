@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Loader;
 using SharpTask.Core.Models.Task;
 using SharpTask.Core.Models.TaskModule;
 
@@ -11,27 +11,36 @@ namespace SharpTask.Core.Services.TaskDllLoader
     public class TaskDllLoaderService : ITaskDllLoaderService
     {
 
-        public Assembly LoadAssembly(AssemblyInformation assembly)
+        public TaskInformation LoadTaskIntoAppDomain(TaskInformation task)
         {
-            var myAssembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(assembly.FullFileName);
 
-            var types = myAssembly.ExportedTypes;
-            var classes = types.Where(x => x.IsClass).ToList();
+            var domain = AppDomain.CreateDomain(task.TaskDirectoryName);
 
-            var result = new List<ISharpTask>();
+            var dir = new DirectoryInfo(task.RunDirectory);
 
-            foreach (var cls in classes.Where(x => x.IsClass))
+            foreach (var file in dir.GetFiles())
             {
-                TypeInfo ti = (TypeInfo) cls;
-                if (ti.ImplementedInterfaces.Any(x =>
-                    x.FullName.Equals("SharpTask.Core.Models.Task.ISharpTask")))
+                var assembly = domain.Load(file.FullName);
+
+                var types = assembly.ExportedTypes;
+                var classes = types.Where(x => x.IsClass).ToList();
+
+                var result = new List<ISharpTask>();
+
+                foreach (var cls in classes.Where(x => x.IsClass))
                 {
-//                    var instance = Activator.CreateInstance(cls);
-//                    result.Add(instance as ISharpTask);
-                    return myAssembly;
+                    TypeInfo ti = (TypeInfo)cls;
+                    if (ti.ImplementedInterfaces.Any(x =>
+                        x.FullName.Equals("SharpTask.Core.Models.Task.ISharpTask")))
+                    {
+                        var instance = Activator.CreateInstance(cls);
+                        result.Add(instance as ISharpTask);
+                    }
                 }
+                task.RunInstance = result;
             }
-            throw new Exception("Assembly does not contain implementation of interface <SharpTask.Core.Models.Task.ISharpTask>");
+            task.Domain = domain;
+            return task;
         }
     }
 }

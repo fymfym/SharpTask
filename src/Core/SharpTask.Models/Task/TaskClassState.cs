@@ -26,7 +26,7 @@ namespace SharpTask.Core.Models.Task
 
         public ExecutionResult LatestExecutionResult { get; set; }
 
-        public TaskClassState(AssemblyInformation taskInformation, ISharpTask sharpTask)
+        public TaskClassState(TaskInformation taskInformation, ISharpTask sharpTask)
         {
             _sharpTask = sharpTask ?? throw new Exception("ISharpTask empty/null");
             TaskExecutions = new List<TaskClassExecution>();

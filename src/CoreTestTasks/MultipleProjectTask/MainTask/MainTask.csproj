@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SubTask\SubTask.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="SharpTask.Core.Models">
+      <HintPath>..\..\SharpTask.Core.Models.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

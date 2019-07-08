@@ -3,10 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using SharpTask.Core.Models.Task;
 using SharpTask.Core.Models.TaskModule;
-using SharpTask.Core.Services.TaskCollection;
+using SharpTask.Core.Services.TaskDirectoryFileService;
 using SharpTask.Core.Services.TaskDirectoryManipulation;
 using SharpTask.Core.Services.TaskDllLoader;
 using SharpTask.Core.Services.TaskExecution;
@@ -24,9 +25,9 @@ namespace SharpTask.Core.Services.TaskExecuter
         bool _running;
 
         // ReSharper disable once FieldCanBeMadeReadOnly.Local
-        private Dictionary<long, AssemblyInformation> _activeAssemblies;
+        private Dictionary<long, TaskInformation> _activeAssemblies;
         // ReSharper disable once FieldCanBeMadeReadOnly.Local
-        private Dictionary<long, AssemblyInformation> _closedAssemblies;
+        private Dictionary<long, TaskInformation> _closedAssemblies;
         // ReSharper disable once FieldCanBeMadeReadOnly.Local
         private Dictionary<long, TaskClassState> _activeTaskClasses;
 
@@ -44,9 +45,9 @@ namespace SharpTask.Core.Services.TaskExecuter
             _taskDirectoryManipulationService = taskDirectoryManipulationService;
             _taskExecutionService = taskExecutionService;
 
-            _activeAssemblies = new Dictionary<long, AssemblyInformation>();
+            _activeAssemblies = new Dictionary<long, TaskInformation>();
             _activeTaskClasses = new Dictionary<long, TaskClassState>();
-            _closedAssemblies = new Dictionary<long, AssemblyInformation>();
+            _closedAssemblies = new Dictionary<long, TaskInformation>();
         }
 
         public void Start()
@@ -57,13 +58,13 @@ namespace SharpTask.Core.Services.TaskExecuter
             while (_running)
             {
 
-                var unloadableAssembliesTask = _assemblyCollectionService.GetUnloadableAssemblies();
-                var newAssembliesTask = _assemblyCollectionService.GetNewAssemblies();
+                var unloadableAssembliesTask = _assemblyCollectionService.GetUnloadableTaskDirectories();
+                var newAssembliesTask = _assemblyCollectionService.GetNewTaskDirectories();
                 Task.WaitAll(unloadableAssembliesTask, newAssembliesTask);
                 HandleUnloadableAssemblies(unloadableAssembliesTask.Result);
                 HandleNewAssemblies(newAssembliesTask.Result);
 
-                var runnableAssembliesTask = _assemblyCollectionService.GetRunnableAssemblies();
+                var runnableAssembliesTask = _assemblyCollectionService.GetRunnableTaskDirectories();
                 Task.WaitAll(runnableAssembliesTask);
                 LoadRunnableAssemblies(runnableAssembliesTask.Result);
 
@@ -77,13 +78,14 @@ namespace SharpTask.Core.Services.TaskExecuter
         }
 
 
-        private void LoadRunnableAssemblies(IEnumerable<AssemblyInformation> runnableAssemblies)
+        private void LoadRunnableAssemblies(IEnumerable<TaskInformation> taskInformation)
         {
-            foreach (var assemblyInformation in runnableAssemblies)
+            foreach (var assemblyInformation in taskInformation)
             {
-                var assembly = _taskDllLoaderService.LoadAssembly(assemblyInformation);
 
-                var classes = from exported in assembly.ExportedTypes
+                var classes = from assembly in assemblyInformation.Domain.GetAssemblies()
+                              where assembly.ExportedTypes.Any()
+                              from exported in assembly.ExportedTypes
                               where exported.IsClass
                               select exported as TypeInfo;
 
@@ -109,59 +111,59 @@ namespace SharpTask.Core.Services.TaskExecuter
             }
         }
 
-        private void HandleNewAssemblies(IEnumerable<AssemblyInformation> newAssemblies)
+        private void HandleNewAssemblies(IEnumerable<TaskInformation> taskInformation)
         {
-            foreach (var assembly in newAssemblies)
+            foreach (var task in taskInformation)
             {
-                if (_activeAssemblies.ContainsKey(assembly.Hash)) continue;
+                if (_activeAssemblies.ContainsKey(task.Hash)) continue;
                 _logger.LogInformation("{@action}{@task}",
                     "Adding tasks from pickup folder",
-                    assembly.FullFileName);
+                    task.Domain.BaseDirectory);
 
                 try
                 {
                     _logger.LogInformation("{@action}{@assembly}",
                         "Load assembly",
-                        assembly.FullFileName);
+                        task.Domain.BaseDirectory);
 
-                    var loadedAssembly = _taskDllLoaderService.LoadAssembly(assembly);
+                    var loadedAssembly = _taskDllLoaderService.LoadTaskIntoAppDomain(task);
 
                     _logger.LogInformation("{@action}{@assembly}{@class}",
                         "Loadeed assembly",
-                        loadedAssembly.FullName,
+                        task.Domain.BaseDirectory,
                         loadedAssembly.GetType());
 
                     _activeAssemblies.Add(
-                        assembly.Hash,
-                        assembly
+                        task.Hash,
+                        task
                         );
 
-                    _taskDirectoryManipulationService.CopyTaskFromPickupToRunFolder(assembly);
+                    _taskDirectoryManipulationService.CopyTaskFromPickupToRunFolder(task);
                 }
                 catch (Exception ex)
                 {
                     _logger.LogWarning("{@action}{@taskfile}{@exception}",
                         "TaskAssembly loaded failed, multipl possible reasons",
-                        assembly.FullFileName,
+                        task.Domain.BaseDirectory,
                         ex.ToString());
-                    _taskDirectoryManipulationService.MoveTaskFromPickupToErrorFolder(assembly);
+                    _taskDirectoryManipulationService.MoveTaskFromPickupToErrorFolder(task);
                 }
             }
         }
 
-        private void HandleUnloadableAssemblies(IEnumerable<AssemblyInformation> closableAssemblies)
+        private void HandleUnloadableAssemblies(IEnumerable<TaskInformation> closableTasks)
         {
-            foreach (var assembly in closableAssemblies)
+            foreach (var task in closableTasks)
             {
-                if (_activeAssemblies.ContainsKey(assembly.Hash))
+                if (_activeAssemblies.ContainsKey(task.Hash))
                 {
                     _logger.LogInformation("{@action}{@task}",
                         "Removing task",
-                        assembly.FullFileName);
-                    _activeAssemblies.Remove(assembly.Hash);
-                    _closedAssemblies.Add(assembly.Hash, assembly);
+                        task.Domain.BaseDirectory);
+                    _activeAssemblies.Remove(task.Hash);
+                    _closedAssemblies.Add(task.Hash, task);
                 }
-                _taskDirectoryManipulationService.MoveTaskFromRunToUnloadFolder(assembly);
+                _taskDirectoryManipulationService.MoveTaskFromRunToUnloadFolder(task);
             }
 
         }
@@ -178,9 +180,9 @@ namespace SharpTask.Core.Services.TaskExecuter
                     _logger.LogInformation("{@action}{@class}{@trigger}",
                         "Executing task",
                         sharpTaskClassInformation.Value.GetType(),
-                        executeResult.UsedTrigger.GetType());
+                        executeResult?.UsedTrigger?.GetType());
 
-                    _taskExecutionService.MarkAsStarted(sharpTaskClassInformation.Value,DateTime.Now);
+                    _taskExecutionService.MarkAsStarted(sharpTaskClassInformation.Value, DateTime.Now);
                     System.Threading.Thread runTask = new System.Threading.Thread(RunTask);
                     runTask.Start(sharpTaskClassInformation);
                 }
@@ -210,7 +212,7 @@ namespace SharpTask.Core.Services.TaskExecuter
                     result.Successful,
                     result.TaskFinished);
 
-                _taskExecutionService.MarkAsFinishedOk(sharpTask,DateTime.Now);
+                _taskExecutionService.MarkAsFinishedOk(sharpTask, DateTime.Now);
 
                 foreach (var log in result.LogLines)
                 {
@@ -229,7 +231,7 @@ namespace SharpTask.Core.Services.TaskExecuter
                     sharpTask.SharpTask.Name,
                     sharpTask.SharpTask.Description,
                     ex.ToString());
-                _taskExecutionService.MarkAsFinishedError(sharpTask,DateTime.Now);
+                _taskExecutionService.MarkAsFinishedError(sharpTask, DateTime.Now);
 
             }
         }

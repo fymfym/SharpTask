@@ -1,13 +1,11 @@
 ﻿using System.IO;
-using System.Linq;
 using FakeItEasy;
 using Microsoft.Extensions.Logging;
 using SharpTask.Core.Models.Configuration;
 using SharpTask.Core.Repository.TaskModule;
 using SharpTask.Core.Services.TaskDirectoryManipulation;
-using Xunit;
 
-namespace SharpTask.Core.Test.Services
+namespace SharpTask.Core.Test.ServicesTest
 {
     public class TaskExecuterServiceTest
     {
@@ -64,29 +62,5 @@ namespace SharpTask.Core.Test.Services
                 file.Delete();
             new DirectoryInfo(_unloadFolder).Delete();
         }
-
-        //[Fact]
-        public void GetTasksInPickupFolderTest()
-        {
-            var service = new TaskDirectoryManipulationService(_fakedLogger,_configuration,_repo);
-
-            var files = service.GetTasksInPickupFolder().ToList();
-
-            Assert.NotEmpty(files);
-            Assert.NotEmpty(files.Where(x => x.FullFileName.EndsWith(PickupFile)));
-
-        }
-
-        //[Fact]
-        public void GetTasksInRunFolderTest()
-        {
-            var service = new TaskDirectoryManipulationService(_fakedLogger,_configuration,_repo);
-
-            var files = service.GetTasksInRunFolder().ToList();
-
-            Assert.NotEmpty(files);
-            Assert.NotEmpty(files.Where(x => x.FullFileName.EndsWith(RunFile)));
-        }
-
     }
 }

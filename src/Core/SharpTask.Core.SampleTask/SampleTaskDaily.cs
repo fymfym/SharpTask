@@ -44,7 +44,10 @@ namespace SharpTask.Core.SampleTask
 
         public string Owner => "Sample task owner";
 
-        List<ITriggerInterface> ISharpTask.RunTrigger => throw new NotImplementedException();
+        List<ITriggerInterface> ISharpTask.RunTrigger => new List<ITriggerInterface>()
+        {
+            new TriggerOneTime(new StDate(DateTime.Now), new StTime(DateTime.Now))
+        };
 
         public RunResult RunTask(TaskParameters taskParameters)
         {

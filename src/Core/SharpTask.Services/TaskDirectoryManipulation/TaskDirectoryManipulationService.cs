@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
@@ -11,6 +12,12 @@ namespace SharpTask.Core.Services.TaskDirectoryManipulation
 {
     public class TaskDirectoryManipulationService :ITaskDirectoryManipulationService
     {
+
+        private enum EDirectoryType
+        {
+            Pickup,
+            Run
+        }
 
         private readonly TaskDirectoryManipulationConfiguration _configuration;
         private readonly ITaskModuleRepository _taskModuleRepository;
@@ -27,92 +34,124 @@ namespace SharpTask.Core.Services.TaskDirectoryManipulation
             _logger = logger;
         }
 
-        public IEnumerable<AssemblyInformation> GetTasksInPickupFolder()
+        public IEnumerable<TaskInformation> GetTasksInPickupFolder()
         {
-            return GetFiles(_configuration.TaskPickupFolder);
+            return GetDirectories(_configuration.TaskPickupFolder, EDirectoryType.Pickup);
         }
 
-        public IEnumerable<AssemblyInformation> GetTasksInRunFolder()
+        public IEnumerable<TaskInformation> GetTasksInRunFolder()
         {
-            return GetFiles(_configuration.TaskRunFolder);
+            return GetDirectories(_configuration.TaskRunFolder, EDirectoryType.Run);
         }
 
-        private IEnumerable<AssemblyInformation> GetFiles(string directory)
+        private IEnumerable<TaskInformation> GetDirectories(string directory,EDirectoryType directoryType)
         {
-            var result = new List<AssemblyInformation>();
-
+            var result = new List<TaskInformation>();
 
             var dirInfo = new DirectoryInfo(directory);
             if (!dirInfo.Exists) dirInfo.Create();
 
-            var list = _taskModuleRepository.GetDirectoryInfo(dirInfo.FullName).GetFiles();
+            var list = _taskModuleRepository.GetDirectoryInfo(dirInfo.FullName).GetDirectories();
 
             foreach (var item in list)
             {
-                var file = _taskModuleRepository.GetFileInfo(item.FullName);
-                result.Add(GenerateTaskModuleInformation(file));
+                var info = GenerateTaskModuleInformation(item);
+                switch (directoryType)
+                {
+                    case EDirectoryType.Pickup:
+                        info.PickupDirectory = item.FullName;
+                        break;
+                    case EDirectoryType.Run:
+                        info.RunDirectory = item.FullName;
+                        break;
+                }
+                result.Add(info);
             }
 
             return result;
         }
 
-        private AssemblyInformation GenerateTaskModuleInformation(FileInfo fileInfo)
+
+        private TaskInformation GenerateTaskModuleInformation(DirectoryInfo info)
         {
-            return new AssemblyInformation()
+            return new TaskInformation()
             {
-                FullFileName = fileInfo.FullName,
-                Hash = GetFileHashCode(fileInfo)
+                TaskDirectoryName = info.Name,
+                Hash = GetDirectoryHashCode(info)
             };
         }
 
 
-        private int GetFileHashCode(FileInfo file)
+        private static int GetDirectoryHashCode(DirectoryInfo directory)
         {
-            return file.Name.GetHashCode() +
-                   file.CreationTime.ToString(CultureInfo.InvariantCulture).GetHashCode();
+            return directory.Name.GetHashCode() +
+                   directory.CreationTime.ToString(CultureInfo.InvariantCulture).GetHashCode();
         }
 
-        public async Task<AssemblyInformation> CopyTaskFromPickupToRunFolder(AssemblyInformation taskInformation)
+        public async Task<TaskInformation> CopyTaskFromPickupToRunFolder(TaskInformation taskInformation)
         {
-            var dest = new DirectoryInfo(_configuration.TaskRunFolder);
-            var newFile = await _taskModuleRepository.CopyFile(new FileInfo(taskInformation.FullFileName), dest);
-            var res = GenerateTaskModuleInformation(newFile);
+            var dest = new DirectoryInfo(Path.Combine(_configuration.TaskRunFolder,taskInformation.TaskDirectoryName));
+            dest.Create();
+
+            if (string.IsNullOrEmpty(taskInformation.PickupDirectory)) throw new Exception("Pickup folder value is empty, should not be");
+            var dir = new DirectoryInfo(taskInformation.PickupDirectory);
+
+            foreach (var fileInfo in dir.GetFiles())
+            {
+                await _taskModuleRepository.CopyFile(fileInfo, dest);
+            }
+
+            taskInformation.RunDirectory = dest.FullName;
 
             _logger.LogInformation("{@action}{@source}{@destination}",
                 "CopyTaskFromPickupToRunFolder",
                 taskInformation,
-                res);
+                dest);
 
-            return res;
+            return taskInformation;
         }
 
-        public async Task<AssemblyInformation> MoveTaskFromPickupToErrorFolder(AssemblyInformation taskInformation)
+        public async Task<TaskInformation> MoveTaskFromPickupToErrorFolder(TaskInformation taskInformation)
         {
-            var dest = new DirectoryInfo(_configuration.TaskLoadErrorFolder);
-            var newFile = await _taskModuleRepository.MoveFile(new FileInfo(taskInformation.FullFileName), dest);
-            var res = GenerateTaskModuleInformation(newFile);
+            var dest = new DirectoryInfo(Path.Combine(_configuration.TaskLoadErrorFolder,taskInformation.TaskDirectoryName));
+            dest.Create();
+
+            if (string.IsNullOrEmpty(taskInformation.PickupDirectory)) throw new Exception("Pickup folder value is empty, should not be");
+            var dir = new DirectoryInfo(taskInformation.PickupDirectory);
+
+            foreach (var fileInfo in dir.GetFiles())
+            {
+                await _taskModuleRepository.CopyFile(fileInfo, dest);
+            }
 
             _logger.LogInformation("{@action}{@source}{@destination}",
                 "MoveTaskFromPickupToErrorFolder",
                 taskInformation,
-                res);
+                dest.FullName);
 
-            return res;
+            return taskInformation;
         }
 
-        public async  Task<AssemblyInformation> MoveTaskFromRunToUnloadFolder(AssemblyInformation taskInformation)
+        public async  Task<TaskInformation> MoveTaskFromRunToUnloadFolder(TaskInformation taskInformation)
         {
+            var dest = new DirectoryInfo(Path.Combine(_configuration.TaskUnloadFolder,taskInformation.TaskDirectoryName));
+            dest.Create();
 
-            var dest = new DirectoryInfo(_configuration.TaskUnloadFolder);
-            var newFile = await _taskModuleRepository.MoveFile(new FileInfo(taskInformation.FullFileName), dest);
-            var res = GenerateTaskModuleInformation(newFile);
+            if (string.IsNullOrEmpty(taskInformation.RunDirectory)) throw new Exception("Run folder value is empty, should not be");
+
+            var dir = new DirectoryInfo(taskInformation.PickupDirectory);
+
+            foreach (var fileInfo in dir.GetFiles())
+            {
+                await _taskModuleRepository.CopyFile(fileInfo, dest);
+            }
 
             _logger.LogInformation("{@action}{@source}{@destination}",
                 "MoveTaskFromRunToUnloadFolder",
                 taskInformation,
-                res);
+                dest.FullName);
 
-            return res;
+            return taskInformation;
         }
     }
 }

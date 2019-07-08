@@ -14,7 +14,7 @@ namespace SharpTask.Core.Test.SharpTaskExecuterTest
         //public void TestDllLoadStateCreation()
         //{
         //    var sharpTask = A.Fake<ISharpTask>();
-        //    var assemblyInformation = new AssemblyInformation();
+        //    var assemblyInformation = new TaskInformation();
         //    var et = new TaskClassState(assemblyInformation, sharpTask);
         //    Assert.True(et.LatestExecutionResult == TaskClassState.ExecutionResult.NotSet);
         //    Assert.True(et.ExecutingState == TaskClassState.ExecuteState.WaitingForStartTrigger);
@@ -24,7 +24,7 @@ namespace SharpTask.Core.Test.SharpTaskExecuterTest
         //public void TestDllLoadStateMarkAsStarted()
         //{
         //    var sharpTask = A.Fake<ISharpTask>();
-        //    var assemblyInformation = new AssemblyInformation();
+        //    var assemblyInformation = new TaskInformation();
         //    var et = new TaskClassState(assemblyInformation, sharpTask);
         //    et.MarkAsStarted(DateTime.MinValue);
         //    Assert.True(et.ExecutingState == TaskClassState.ExecuteState.Executing);
@@ -34,7 +34,7 @@ namespace SharpTask.Core.Test.SharpTaskExecuterTest
         //public void TestDllLoadStateMarkAsFinishedOk()
         //{
         //    var sharpTask = A.Fake<ISharpTask>();
-        //    var assemblyInformation = new AssemblyInformation();
+        //    var assemblyInformation = new TaskInformation();
         //    var et = new TaskClassState(assemblyInformation, sharpTask);
         //    et.MarkAsFinishedOk(DateTime.MinValue);
         //    Assert.True(et.ExecutingState == TaskClassState.ExecuteState.Done);
@@ -45,7 +45,7 @@ namespace SharpTask.Core.Test.SharpTaskExecuterTest
         //public void TestDllLoadStateMarkAsFinishedError()
         //{
         //    var sharpTask = A.Fake<ISharpTask>();
-        //    var assemblyInformation = new AssemblyInformation();
+        //    var assemblyInformation = new TaskInformation();
         //    var et = new TaskClassState(assemblyInformation, sharpTask);
         //    et.MarkAsFinishedError(DateTime.MinValue);
         //    Assert.True(et.ExecutingState == TaskClassState.ExecuteState.Done);
@@ -57,7 +57,7 @@ namespace SharpTask.Core.Test.SharpTaskExecuterTest
         //{
         //    var dt = new DateTime(2017, 1, 1, 12, 00, 00);
         //    var sharpTask = new TaskOneTimeTrigger201701011200();
-        //    var assemblyInformation = new AssemblyInformation();
+        //    var assemblyInformation = new TaskInformation();
         //    var et = new TaskClassState(assemblyInformation, sharpTask);
         //    Assert.True(et.ShouldExecuteNow(dt).ShouldExecuteNow);
         //    et.MarkAsFinishedOk(dt);
@@ -69,7 +69,7 @@ namespace SharpTask.Core.Test.SharpTaskExecuterTest
         //{
         //    var dt = new DateTime(2017, 1, 1, 12, 00, 00);
         //    var sharpTask = new TaskOneTimeTrigger201701011200();
-        //    var assemblyInformation = new AssemblyInformation();
+        //    var assemblyInformation = new TaskInformation();
         //    var et = new TaskClassState(assemblyInformation, sharpTask);
         //    Assert.True(et.ShouldExecuteNow(dt).ShouldExecuteNow);
         //    et.MarkAsFinishedOk(dt);
@@ -81,7 +81,7 @@ namespace SharpTask.Core.Test.SharpTaskExecuterTest
         //{
         //    var dt = new DateTime(2017, 1, 1, 12, 00, 01);
         //    var sharpTask = new TaskOneTimeTrigger201701011200();
-        //    var assemblyInformation = new AssemblyInformation();
+        //    var assemblyInformation = new TaskInformation();
         //    var et = new TaskClassState(assemblyInformation, sharpTask);
         //    Assert.True(et.ShouldExecuteNow(dt).ShouldExecuteNow);
         //}
@@ -91,7 +91,7 @@ namespace SharpTask.Core.Test.SharpTaskExecuterTest
         //{
         //    var dt = new DateTime(2017, 1, 1, 12, 00, 06);
         //    var sharpTask = new TaskOneTimeTrigger201701011200();
-        //    var assemblyInformation = new AssemblyInformation();
+        //    var assemblyInformation = new TaskInformation();
         //    var et = new TaskClassState(assemblyInformation, sharpTask);
         //    Assert.False(et.ShouldExecuteNow(dt).ShouldExecuteNow);
         //}
@@ -101,7 +101,7 @@ namespace SharpTask.Core.Test.SharpTaskExecuterTest
         //{
         //    var dt = new DateTime(2017, 1, 1, 11, 00, 00);
         //    var sharpTask = new TaskOneTimeTrigger201701011200();
-        //    var assemblyInformation = new AssemblyInformation();
+        //    var assemblyInformation = new TaskInformation();
         //    var et = new TaskClassState(assemblyInformation, sharpTask);
         //    Assert.False(et.ShouldExecuteNow(dt).ShouldExecuteNow);
         //}
@@ -112,7 +112,7 @@ namespace SharpTask.Core.Test.SharpTaskExecuterTest
         //{
         //    var dt = new DateTime(2017, 1, 1, 13, 00, 00);
         //    var sharpTask = new TaskOneTimeTrigger201701011200();
-        //    var assemblyInformation = new AssemblyInformation();
+        //    var assemblyInformation = new TaskInformation();
         //    var et = new TaskClassState(assemblyInformation, sharpTask);
         //    Assert.False(et.ShouldExecuteNow(dt).ShouldExecuteNow);
         //}

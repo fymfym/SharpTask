@@ -18,7 +18,7 @@ namespace SharpTask.Core.Test.ServicesTest
         public TaskExecutionServiceTest()
         {
             _fakedRepository = A.Fake<ITaskExecutionRepository>();
-            _task = new TaskClassState(new AssemblyInformation(), new TemporaryTask());
+            _task = new TaskClassState(new TaskInformation(), new TemporaryTask());
         }
 
         [Fact]
@@ -59,7 +59,7 @@ namespace SharpTask.Core.Test.ServicesTest
             var dt = new DateTime(2017, 1, 1, 12, 00, 00);
             var t = new TaskOneTimeTrigger201701011200();
             var et = new TaskExecutionService(_fakedRepository);
-            var task = new TaskClassState(new AssemblyInformation(), t);
+            var task = new TaskClassState(new TaskInformation(), t);
             
             et.MarkAsFinishedOk(task,dt);
 
@@ -73,7 +73,7 @@ namespace SharpTask.Core.Test.ServicesTest
             var dt = new DateTime(2017, 1, 1, 12, 00, 00);
             var t = new TaskOneTimeTrigger201701011200();
             var et = new TaskExecutionService(_fakedRepository);
-            var task = new TaskClassState(new AssemblyInformation(), t);
+            var task = new TaskClassState(new TaskInformation(), t);
             
             et.MarkAsFinishedOk(task, dt);
 
@@ -85,7 +85,7 @@ namespace SharpTask.Core.Test.ServicesTest
         {
             var dt = new DateTime(2017, 1, 1, 12, 00, 01);
             var t = new TaskOneTimeTrigger201701011200();
-            var task = new TaskClassState(new AssemblyInformation(), t);
+            var task = new TaskClassState(new TaskInformation(), t);
             var et = new TaskExecutionService(_fakedRepository);
          
             Assert.True(et.ShouldExecuteNow(task, dt).ShouldExecuteNow);
@@ -96,7 +96,7 @@ namespace SharpTask.Core.Test.ServicesTest
         {
             var dt = new DateTime(2017, 1, 1, 12, 00, 06);
             var t = new TaskOneTimeTrigger201701011200();
-            var task = new TaskClassState(new AssemblyInformation(), t);
+            var task = new TaskClassState(new TaskInformation(), t);
             var et = new TaskExecutionService(_fakedRepository);
 
             Assert.False(et.ShouldExecuteNow(task,dt).ShouldExecuteNow);
@@ -107,7 +107,7 @@ namespace SharpTask.Core.Test.ServicesTest
         {
             var dt = new DateTime(2017, 1, 1, 11, 00, 00);
             var t = new TaskOneTimeTrigger201701011200();
-            var task = new TaskClassState(new AssemblyInformation(), t);
+            var task = new TaskClassState(new TaskInformation(), t);
             var et = new TaskExecutionService(_fakedRepository);
 
             Assert.False(et.ShouldExecuteNow(task, dt).ShouldExecuteNow);
@@ -119,7 +119,7 @@ namespace SharpTask.Core.Test.ServicesTest
         {
             var dt = new DateTime(2017, 1, 1, 13, 00, 00);
             var t = new TaskOneTimeTrigger201701011200();
-            var task = new TaskClassState(new AssemblyInformation(), t);
+            var task = new TaskClassState(new TaskInformation(), t);
             var et = new TaskExecutionService(_fakedRepository);
             Assert.False(et.ShouldExecuteNow(task,dt).ShouldExecuteNow);
         }

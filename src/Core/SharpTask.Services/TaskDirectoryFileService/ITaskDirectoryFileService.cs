@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using SharpTask.Core.Models.TaskModule;
 
-namespace SharpTask.Core.Services.TaskCollection
+namespace SharpTask.Core.Services.TaskDirectoryFileService
 {
     /// <summary>
     /// Manipulates the directories and move module files around, using appropriate related services
@@ -10,8 +10,8 @@ namespace SharpTask.Core.Services.TaskCollection
     /// 
     public interface IAssemblyCollectionService
     {
-        Task<IEnumerable<AssemblyInformation>> GetRunnableAssemblies();
-        Task<IEnumerable<AssemblyInformation>> GetUnloadableAssemblies();
-        Task<IEnumerable<AssemblyInformation>> GetNewAssemblies();
+        Task<IEnumerable<TaskInformation>> GetRunnableTaskDirectories();
+        Task<IEnumerable<TaskInformation>> GetUnloadableTaskDirectories();
+        Task<IEnumerable<TaskInformation>> GetNewTaskDirectories();
     }
 }
