@@ -2,8 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Security.Cryptography;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using SharpTask.Core.Models.Task;
 using SharpTask.Core.Models.TaskModule;
@@ -24,12 +23,7 @@ namespace SharpTask.Core.Services.TaskExecuter
 
         bool _running;
 
-        // ReSharper disable once FieldCanBeMadeReadOnly.Local
-        private Dictionary<long, TaskInformation> _activeAssemblies;
-        // ReSharper disable once FieldCanBeMadeReadOnly.Local
-        private Dictionary<long, TaskInformation> _closedAssemblies;
-        // ReSharper disable once FieldCanBeMadeReadOnly.Local
-        private Dictionary<long, TaskClassState> _activeTaskClasses;
+        private Dictionary<string,TaskClassState> _activeTasks;
 
         public TaskExecuterService(
             ILogger<TaskExecuterService> logger,
@@ -45,30 +39,56 @@ namespace SharpTask.Core.Services.TaskExecuter
             _taskDirectoryManipulationService = taskDirectoryManipulationService;
             _taskExecutionService = taskExecutionService;
 
-            _activeAssemblies = new Dictionary<long, TaskInformation>();
-            _activeTaskClasses = new Dictionary<long, TaskClassState>();
-            _closedAssemblies = new Dictionary<long, TaskInformation>();
+            _activeTasks = new Dictionary<string, TaskClassState>();
         }
+
+        private List<TaskInformation> _oldRunnable = new List<TaskInformation>();
 
         public void Start()
         {
-            _logger.LogInformation("Starting SharpTaskExecuter");
+            _logger.LogInformation("Starting SharpTaskExecuter starting");
             _running = true;
+
+            var unloadableTaskDirectoriesTask = _assemblyCollectionService.GetUnloadableTaskDirectories();
+            Task.WaitAll(unloadableTaskDirectoriesTask);
+            HandleUnloadable(unloadableTaskDirectoriesTask.Result);
 
             while (_running)
             {
+                var newTaskDirectoriesTask = _assemblyCollectionService.GetNewTaskDirectories();
+                Task.WaitAll(newTaskDirectoriesTask);
+                HandleNewAssemblies(newTaskDirectoriesTask.Result);
 
-                var unloadableAssembliesTask = _assemblyCollectionService.GetUnloadableTaskDirectories();
-                var newAssembliesTask = _assemblyCollectionService.GetNewTaskDirectories();
-                Task.WaitAll(unloadableAssembliesTask, newAssembliesTask);
-                HandleUnloadableAssemblies(unloadableAssembliesTask.Result);
-                HandleNewAssemblies(newAssembliesTask.Result);
+                var runnableTaskDirectoriesTask = _assemblyCollectionService.GetRunnableTaskDirectories();
+                Task.WaitAll(runnableTaskDirectoriesTask);
 
-                var runnableAssembliesTask = _assemblyCollectionService.GetRunnableTaskDirectories();
-                Task.WaitAll(runnableAssembliesTask);
-                LoadRunnableAssemblies(runnableAssembliesTask.Result);
+                List<TaskInformation> runnable = runnableTaskDirectoriesTask.Result.ToList();
 
-                ExecuteClasses();
+                if (string.Join(',',_oldRunnable.Select(x => x.DirectoryMd5)) !=
+                    string.Join(',' ,runnableTaskDirectoriesTask.Result.Select(x => x.DirectoryMd5)))
+                {
+                    var lst = from run in runnable
+                                join old in _oldRunnable
+                            on run.DirectoryMd5 equals old.DirectoryMd5
+                        select run;
+
+                    foreach (var taskInformation in lst)
+                    {
+                        _logger.LogInformation("{@action}{@tasks}",
+                            "New task added",
+                            taskInformation.Directory.Name);
+                    }
+
+                        
+                        
+                }
+
+                LoadRunnableAssemblies(runnableTaskDirectoriesTask.Result);
+                _oldRunnable = runnableTaskDirectoriesTask.Result.ToList();
+
+
+
+                ExecuteClasses(runnableTaskDirectoriesTask.Result);
             }
         }
 
@@ -80,111 +100,69 @@ namespace SharpTask.Core.Services.TaskExecuter
 
         private void LoadRunnableAssemblies(IEnumerable<TaskInformation> taskInformation)
         {
-            foreach (var assemblyInformation in taskInformation)
+            foreach (var task in taskInformation)
             {
-
-                var classes = from assembly in assemblyInformation.Domain.GetAssemblies()
-                              where assembly.ExportedTypes.Any()
-                              from exported in assembly.ExportedTypes
-                              where exported.IsClass
-                              select exported as TypeInfo;
-
-                foreach (var cls in classes)
-                {
-                    if (cls.ImplementedInterfaces.Any(x =>
-                        x.FullName.Equals("SharpTask.Core.Models.Task.ISharpTask")))
-                    {
-                        var instance = (ISharpTask)Activator.CreateInstance(cls);
-                        _logger.LogInformation("{@action}{@taskName}{@Tasktype}{@TaskDescription}",
-                            "Instaciation class",
-                            instance.Name,
-                            instance.GetType(),
-                            instance.Description);
-
-
-                        var sharpClass = new TaskClassState(assemblyInformation, instance);
-
-                        _activeTaskClasses.Add(sharpClass.GetHashCode(), sharpClass);
-                    }
-                }
-
+                _taskDllLoaderService.LoadTaskIntoAppDomain(task);
             }
         }
+
+        private void HandleUnloadable(IEnumerable<TaskInformation> taskInformation)
+        {
+            foreach (var task in taskInformation)
+            {
+                _taskDirectoryManipulationService.MoveDirectoryUnloadFolder(task);
+            }
+        }
+        
 
         private void HandleNewAssemblies(IEnumerable<TaskInformation> taskInformation)
         {
             foreach (var task in taskInformation)
             {
-                if (_activeAssemblies.ContainsKey(task.Hash)) continue;
-                _logger.LogInformation("{@action}{@task}",
-                    "Adding tasks from pickup folder",
-                    task.Domain.BaseDirectory);
-
                 try
                 {
-                    _logger.LogInformation("{@action}{@assembly}",
-                        "Load assembly",
-                        task.Domain.BaseDirectory);
+                    _logger.LogInformation("{@action}{@directory}",
+                        "Copying task to run folder",
+                        task.Directory.FullName);
 
-                    var loadedAssembly = _taskDllLoaderService.LoadTaskIntoAppDomain(task);
-
-                    _logger.LogInformation("{@action}{@assembly}{@class}",
-                        "Loadeed assembly",
-                        task.Domain.BaseDirectory,
-                        loadedAssembly.GetType());
-
-                    _activeAssemblies.Add(
-                        task.Hash,
-                        task
-                        );
-
-                    _taskDirectoryManipulationService.CopyTaskFromPickupToRunFolder(task);
+                    _taskDirectoryManipulationService.CopyDirectoryToRunFolder(task);
                 }
                 catch (Exception ex)
                 {
                     _logger.LogWarning("{@action}{@taskfile}{@exception}",
                         "TaskAssembly loaded failed, multipl possible reasons",
-                        task.Domain.BaseDirectory,
+                        task.Directory.FullName,
                         ex.ToString());
-                    _taskDirectoryManipulationService.MoveTaskFromPickupToErrorFolder(task);
+                    _taskDirectoryManipulationService.MoveDirectoryToErrorFolder(task);
                 }
             }
         }
 
-        private void HandleUnloadableAssemblies(IEnumerable<TaskInformation> closableTasks)
+        private void ExecuteClasses(IEnumerable<TaskInformation> taskInformationList)
         {
-            foreach (var task in closableTasks)
+            foreach (var taskInformation in taskInformationList)
             {
-                if (_activeAssemblies.ContainsKey(task.Hash))
+                foreach (var instance in taskInformation.RunInstance)
                 {
-                    _logger.LogInformation("{@action}{@task}",
-                        "Removing task",
-                        task.Domain.BaseDirectory);
-                    _activeAssemblies.Remove(task.Hash);
-                    _closedAssemblies.Add(task.Hash, task);
-                }
-                _taskDirectoryManipulationService.MoveTaskFromRunToUnloadFolder(task);
-            }
+                    var sharpTaskClassInformation = new TaskClassState(taskInformation, instance);
+                 
+                    if (_activeTasks.ContainsKey(taskInformation.DirectoryMd5)) continue;
 
-        }
+                    _activeTasks.Add(taskInformation.DirectoryMd5, sharpTaskClassInformation);
+                    
+                    var executeResult = _taskExecutionService.ShouldExecuteNow(sharpTaskClassInformation, DateTime.Now);
 
-        private void ExecuteClasses()
-        {
-            foreach (var sharpTaskClassInformation in _activeTaskClasses)
-            {
-                var executeResult = _taskExecutionService.ShouldExecuteNow(sharpTaskClassInformation.Value, DateTime.Now);
+                    if (executeResult.ShouldExecuteNow)
+                    {
+                        _logger.LogInformation("{@action}{@class}{@trigger}",
+                            "Executing task",
+                            sharpTaskClassInformation.GetType(),
+                            executeResult.UsedTrigger?.GetType());
 
-
-                if (executeResult.ShouldExecuteNow)
-                {
-                    _logger.LogInformation("{@action}{@class}{@trigger}",
-                        "Executing task",
-                        sharpTaskClassInformation.Value.GetType(),
-                        executeResult?.UsedTrigger?.GetType());
-
-                    _taskExecutionService.MarkAsStarted(sharpTaskClassInformation.Value, DateTime.Now);
-                    System.Threading.Thread runTask = new System.Threading.Thread(RunTask);
-                    runTask.Start(sharpTaskClassInformation);
+                        _taskExecutionService.MarkAsStarted(sharpTaskClassInformation, DateTime.Now);
+                        System.Threading.Thread runTask = new System.Threading.Thread(RunTask);
+                        runTask.Start(sharpTaskClassInformation);
+                    }
                 }
             }
         }

@@ -1,21 +1,11 @@
-﻿
-using System;
+﻿using System;
 using SharpTask.Core.Models.Task;
-using SharpTask.Core.Repository.TaskExecution;
 
 namespace SharpTask.Core.Services.TaskExecution
 {
     public class TaskExecutionService : ITaskExecutionService
     {
 
-        private readonly ITaskExecutionRepository _executionRepository;
-
-        public TaskExecutionService(
-            ITaskExecutionRepository executionRepository
-            )
-        {
-            _executionRepository = executionRepository;
-        }
 
         private readonly object _lockObject = new object();
         public void MarkAsStarted(TaskClassState task, DateTime currentTime)
@@ -71,9 +61,10 @@ namespace SharpTask.Core.Services.TaskExecution
                         {
                             ts = new TimeSpan(task.LastExecuteStart.Ticks - currentTime.Ticks).TotalSeconds;
                             if (ts < 0) run = false;
-                            
                         }
+                        
                     }
+                    if (run) result.UsedTrigger = tt;
                 }
                 else
                 {
@@ -84,6 +75,8 @@ namespace SharpTask.Core.Services.TaskExecution
 
             if (run)
                 result.ShouldExecuteNow = true;
+            else
+                result.UsedTrigger = null;
 
             return result;
         }

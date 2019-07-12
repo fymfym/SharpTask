@@ -1,8 +1,6 @@
 ﻿using System;
-using FakeItEasy;
 using SharpTask.Core.Models.Task;
 using SharpTask.Core.Models.TaskModule;
-using SharpTask.Core.Repository.TaskExecution;
 using SharpTask.Core.Services.TaskExecution;
 using SharpTask.Core.Test.SharpTaskExecuterTest.TestHelpers;
 using Xunit;
@@ -12,19 +10,17 @@ namespace SharpTask.Core.Test.ServicesTest
     public class TaskExecutionServiceTest
     {
 
-        private readonly ITaskExecutionRepository _fakedRepository;
         private readonly TaskClassState _task;
 
         public TaskExecutionServiceTest()
         {
-            _fakedRepository = A.Fake<ITaskExecutionRepository>();
             _task = new TaskClassState(new TaskInformation(), new TemporaryTask());
         }
 
         [Fact]
         public void TaskExecutionServiceMarkAsStarted()
         {
-            var et = new TaskExecutionService(_fakedRepository);
+            var et = new TaskExecutionService();
             
             et.MarkAsStarted(_task, DateTime.MinValue);
             
@@ -34,7 +30,7 @@ namespace SharpTask.Core.Test.ServicesTest
         [Fact]
         public void TestDllLoadStateMarkAsFinishedOk()
         {
-            var et = new TaskExecutionService(_fakedRepository);
+            var et = new TaskExecutionService();
 
             et.MarkAsFinishedOk(_task, DateTime.MinValue);
             
@@ -45,7 +41,7 @@ namespace SharpTask.Core.Test.ServicesTest
         [Fact]
         public void TestDllLoadStateMarkAsFinishedError()
         {
-            var et = new TaskExecutionService(_fakedRepository);
+            var et = new TaskExecutionService();
             
             et.MarkAsFinishedError(_task, DateTime.MinValue);
             
@@ -58,7 +54,7 @@ namespace SharpTask.Core.Test.ServicesTest
         {
             var dt = new DateTime(2017, 1, 1, 12, 00, 00);
             var t = new TaskOneTimeTrigger201701011200();
-            var et = new TaskExecutionService(_fakedRepository);
+            var et = new TaskExecutionService();
             var task = new TaskClassState(new TaskInformation(), t);
             
             et.MarkAsFinishedOk(task,dt);
@@ -72,7 +68,7 @@ namespace SharpTask.Core.Test.ServicesTest
         {
             var dt = new DateTime(2017, 1, 1, 12, 00, 00);
             var t = new TaskOneTimeTrigger201701011200();
-            var et = new TaskExecutionService(_fakedRepository);
+            var et = new TaskExecutionService();
             var task = new TaskClassState(new TaskInformation(), t);
             
             et.MarkAsFinishedOk(task, dt);
@@ -86,7 +82,7 @@ namespace SharpTask.Core.Test.ServicesTest
             var dt = new DateTime(2017, 1, 1, 12, 00, 01);
             var t = new TaskOneTimeTrigger201701011200();
             var task = new TaskClassState(new TaskInformation(), t);
-            var et = new TaskExecutionService(_fakedRepository);
+            var et = new TaskExecutionService();
          
             Assert.True(et.ShouldExecuteNow(task, dt).ShouldExecuteNow);
         }
@@ -97,7 +93,7 @@ namespace SharpTask.Core.Test.ServicesTest
             var dt = new DateTime(2017, 1, 1, 12, 00, 06);
             var t = new TaskOneTimeTrigger201701011200();
             var task = new TaskClassState(new TaskInformation(), t);
-            var et = new TaskExecutionService(_fakedRepository);
+            var et = new TaskExecutionService();
 
             Assert.False(et.ShouldExecuteNow(task,dt).ShouldExecuteNow);
         }
@@ -108,7 +104,7 @@ namespace SharpTask.Core.Test.ServicesTest
             var dt = new DateTime(2017, 1, 1, 11, 00, 00);
             var t = new TaskOneTimeTrigger201701011200();
             var task = new TaskClassState(new TaskInformation(), t);
-            var et = new TaskExecutionService(_fakedRepository);
+            var et = new TaskExecutionService();
 
             Assert.False(et.ShouldExecuteNow(task, dt).ShouldExecuteNow);
         }
@@ -120,7 +116,7 @@ namespace SharpTask.Core.Test.ServicesTest
             var dt = new DateTime(2017, 1, 1, 13, 00, 00);
             var t = new TaskOneTimeTrigger201701011200();
             var task = new TaskClassState(new TaskInformation(), t);
-            var et = new TaskExecutionService(_fakedRepository);
+            var et = new TaskExecutionService();
             Assert.False(et.ShouldExecuteNow(task,dt).ShouldExecuteNow);
         }
 

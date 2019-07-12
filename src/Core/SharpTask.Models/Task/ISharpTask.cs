@@ -8,6 +8,5 @@ namespace SharpTask.Core.Models.Task
         List<ITriggerInterface> RunTrigger { get; }
         string Name { get; }
         string Description { get; }
-        string Owner { get; }
     }
 }

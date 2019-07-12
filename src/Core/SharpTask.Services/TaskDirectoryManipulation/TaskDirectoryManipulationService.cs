@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SharpTask.Core.Models.Configuration;
@@ -12,13 +14,6 @@ namespace SharpTask.Core.Services.TaskDirectoryManipulation
 {
     public class TaskDirectoryManipulationService :ITaskDirectoryManipulationService
     {
-
-        private enum EDirectoryType
-        {
-            Pickup,
-            Run
-        }
-
         private readonly TaskDirectoryManipulationConfiguration _configuration;
         private readonly ITaskModuleRepository _taskModuleRepository;
         private readonly ILogger<TaskDirectoryManipulationService> _logger;
@@ -34,17 +29,17 @@ namespace SharpTask.Core.Services.TaskDirectoryManipulation
             _logger = logger;
         }
 
-        public IEnumerable<TaskInformation> GetTasksInPickupFolder()
+        public IEnumerable<TaskInformation> GetDirectoriesInPickupFolder()
         {
-            return GetDirectories(_configuration.TaskPickupFolder, EDirectoryType.Pickup);
+            return GetDirectories(_configuration.TaskPickupFolder);
         }
 
-        public IEnumerable<TaskInformation> GetTasksInRunFolder()
+        public IEnumerable<TaskInformation> GetDirectoriesInRunFolder()
         {
-            return GetDirectories(_configuration.TaskRunFolder, EDirectoryType.Run);
+            return GetDirectories(_configuration.TaskRunFolder);
         }
 
-        private IEnumerable<TaskInformation> GetDirectories(string directory,EDirectoryType directoryType)
+        private IEnumerable<TaskInformation> GetDirectories(string directory)
         {
             var result = new List<TaskInformation>();
 
@@ -55,99 +50,102 @@ namespace SharpTask.Core.Services.TaskDirectoryManipulation
 
             foreach (var item in list)
             {
-                var info = GenerateTaskModuleInformation(item);
-                switch (directoryType)
+                var info = new TaskInformation()
                 {
-                    case EDirectoryType.Pickup:
-                        info.PickupDirectory = item.FullName;
-                        break;
-                    case EDirectoryType.Run:
-                        info.RunDirectory = item.FullName;
-                        break;
-                }
+                    Directory = item,
+                    DirectoryMd5 = GetDirectoryMd5(item)
+                };
                 result.Add(info);
             }
 
             return result;
         }
 
-
-        private TaskInformation GenerateTaskModuleInformation(DirectoryInfo info)
+        public string GetDirectoryMd5(DirectoryInfo directory)
         {
-            return new TaskInformation()
+            var hash = "";
+
+            foreach (var fileInfo in directory.GetFiles())
             {
-                TaskDirectoryName = info.Name,
-                Hash = GetDirectoryHashCode(info)
-            };
+                hash += GetFileHash(fileInfo);
+            }
+
+            return CalculateMD5Hash(hash);
         }
 
-
-        private static int GetDirectoryHashCode(DirectoryInfo directory)
+        private string GetFileHash(FileInfo fileInfo)
         {
-            return directory.Name.GetHashCode() +
-                   directory.CreationTime.ToString(CultureInfo.InvariantCulture).GetHashCode();
+            byte[] hash;
+            var sha1 = SHA1.Create();
+            using (FileStream stream = fileInfo.OpenRead()) 
+                hash = sha1.ComputeHash(stream);
+
+            return BitConverter.ToString(hash);
         }
 
-        public async Task<TaskInformation> CopyTaskFromPickupToRunFolder(TaskInformation taskInformation)
+        private string CalculateMD5Hash(string input)
         {
-            var dest = new DirectoryInfo(Path.Combine(_configuration.TaskRunFolder,taskInformation.TaskDirectoryName));
+            // step 1, calculate MD5 hash from input
+            MD5 md5 = MD5.Create();
+            byte[] inputBytes = Encoding.ASCII.GetBytes(input);
+            byte[] hash = md5.ComputeHash(inputBytes);
+ 
+            // step 2, convert byte array to hex string
+            StringBuilder sb = new StringBuilder();
+            foreach (var t in hash)
+            {
+                sb.Append(t.ToString("X2"));
+            }
+            return sb.ToString();
+        }
+        public async Task<TaskInformation> CopyDirectoryToRunFolder(TaskInformation taskInformation)
+        {
+            var dest = new DirectoryInfo(Path.Combine(_configuration.TaskRunFolder,taskInformation.DirectoryName));
             dest.Create();
 
-            if (string.IsNullOrEmpty(taskInformation.PickupDirectory)) throw new Exception("Pickup folder value is empty, should not be");
-            var dir = new DirectoryInfo(taskInformation.PickupDirectory);
-
-            foreach (var fileInfo in dir.GetFiles())
+            foreach (var fileInfo in taskInformation.Directory.GetFiles())
             {
                 await _taskModuleRepository.CopyFile(fileInfo, dest);
             }
 
-            taskInformation.RunDirectory = dest.FullName;
-
             _logger.LogInformation("{@action}{@source}{@destination}",
-                "CopyTaskFromPickupToRunFolder",
+                "CopyDirectoryToRunFolder",
                 taskInformation,
                 dest);
 
             return taskInformation;
         }
 
-        public async Task<TaskInformation> MoveTaskFromPickupToErrorFolder(TaskInformation taskInformation)
+        public async Task<TaskInformation> MoveDirectoryToErrorFolder(TaskInformation taskInformation)
         {
-            var dest = new DirectoryInfo(Path.Combine(_configuration.TaskLoadErrorFolder,taskInformation.TaskDirectoryName));
+            var dest = new DirectoryInfo(Path.Combine(_configuration.TaskLoadErrorFolder,taskInformation.Directory.Name));
             dest.Create();
 
-            if (string.IsNullOrEmpty(taskInformation.PickupDirectory)) throw new Exception("Pickup folder value is empty, should not be");
-            var dir = new DirectoryInfo(taskInformation.PickupDirectory);
-
-            foreach (var fileInfo in dir.GetFiles())
+            foreach (var fileInfo in taskInformation.Directory.GetFiles())
             {
                 await _taskModuleRepository.CopyFile(fileInfo, dest);
             }
 
             _logger.LogInformation("{@action}{@source}{@destination}",
-                "MoveTaskFromPickupToErrorFolder",
+                "MoveDirectoryToErrorFolder",
                 taskInformation,
                 dest.FullName);
 
             return taskInformation;
         }
 
-        public async  Task<TaskInformation> MoveTaskFromRunToUnloadFolder(TaskInformation taskInformation)
+        public async  Task<TaskInformation> MoveDirectoryUnloadFolder(TaskInformation taskInformation)
         {
-            var dest = new DirectoryInfo(Path.Combine(_configuration.TaskUnloadFolder,taskInformation.TaskDirectoryName));
+            var dest = new DirectoryInfo(Path.Combine(_configuration.TaskUnloadFolder,taskInformation.Directory.Name));
             dest.Create();
 
-            if (string.IsNullOrEmpty(taskInformation.RunDirectory)) throw new Exception("Run folder value is empty, should not be");
-
-            var dir = new DirectoryInfo(taskInformation.PickupDirectory);
-
-            foreach (var fileInfo in dir.GetFiles())
+            foreach (var fileInfo in taskInformation.Directory.GetFiles())
             {
                 await _taskModuleRepository.CopyFile(fileInfo, dest);
             }
 
             _logger.LogInformation("{@action}{@source}{@destination}",
-                "MoveTaskFromRunToUnloadFolder",
+                "MoveDirectoryUnloadFolder",
                 taskInformation,
                 dest.FullName);
 

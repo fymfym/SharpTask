@@ -12,10 +12,6 @@ namespace SharpTask.Core.Models.Schedule
         /// <summary>
         /// Starts from StartDateTime date and every at marked weekday at StartDateTime time
         /// </summary>
-        public TriggerWeekday()
-        {
-
-        }
 
         public TriggerWeekday(StDate startDate, StTime executeTime, List<DayOfWeek> weekdayList)
         {

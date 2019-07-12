@@ -1,9 +1,4 @@
 ﻿using System.IO;
-using FakeItEasy;
-using Microsoft.Extensions.Logging;
-using SharpTask.Core.Models.Configuration;
-using SharpTask.Core.Repository.TaskModule;
-using SharpTask.Core.Services.TaskDirectoryManipulation;
 
 namespace SharpTask.Core.Test.ServicesTest
 {
@@ -14,10 +9,6 @@ namespace SharpTask.Core.Test.ServicesTest
         private readonly string _runFolder;
         private readonly string _errorFolder;
         private readonly string _unloadFolder;
-
-        private readonly ILogger<TaskDirectoryManipulationService> _fakedLogger;
-        private readonly TaskDirectoryManipulationConfiguration _configuration;
-        private readonly ITaskModuleRepository _repo;
 
         private const string PickupFile = "PickupFile1.txt";
         private const string RunFile = "RunFile1.txt";
@@ -33,15 +24,6 @@ namespace SharpTask.Core.Test.ServicesTest
             new FileInfo(_pickupFolder + PickupFile).Create();
             new FileInfo(_pickupFolder + RunFile).Create();
 
-            _configuration = new TaskDirectoryManipulationConfiguration()
-            {
-                TaskLoadErrorFolder = _errorFolder,
-                TaskPickupFolder = _pickupFolder,
-                TaskRunFolder = _runFolder,
-                TaskUnloadFolder = _unloadFolder
-            };
-            _repo = new TaskModuleRepository();
-            _fakedLogger = A.Fake<ILogger<TaskDirectoryManipulationService>>();
         }
 
         ~TaskExecuterServiceTest()

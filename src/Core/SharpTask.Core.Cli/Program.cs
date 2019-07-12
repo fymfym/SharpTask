@@ -21,6 +21,8 @@ namespace SharpTask.Core.Cli
 {
     class Program
     {
+
+
         // ReSharper disable once UnusedParameter.Local
         static void Main(string[] args)
         {

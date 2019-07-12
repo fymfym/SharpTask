@@ -6,11 +6,11 @@ namespace SharpTask.Core.Services.TaskDirectoryManipulation
 {
     public interface ITaskDirectoryManipulationService
     {
-        IEnumerable<TaskInformation> GetTasksInPickupFolder();
-        IEnumerable<TaskInformation> GetTasksInRunFolder();
+        IEnumerable<TaskInformation> GetDirectoriesInPickupFolder();
+        IEnumerable<TaskInformation> GetDirectoriesInRunFolder();
 
-        Task<TaskInformation> CopyTaskFromPickupToRunFolder(TaskInformation taskInformation);
-        Task<TaskInformation> MoveTaskFromPickupToErrorFolder(TaskInformation taskInformation);
-        Task<TaskInformation> MoveTaskFromRunToUnloadFolder(TaskInformation taskInformation);
+        Task<TaskInformation> CopyDirectoryToRunFolder(TaskInformation taskInformation);
+        Task<TaskInformation> MoveDirectoryToErrorFolder(TaskInformation taskInformation);
+        Task<TaskInformation> MoveDirectoryUnloadFolder(TaskInformation taskInformation);
     }
 }
