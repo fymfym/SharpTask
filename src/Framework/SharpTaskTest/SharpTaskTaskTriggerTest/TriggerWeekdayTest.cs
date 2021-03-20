@@ -5,7 +5,6 @@ using SharpTask.Task;
 
 namespace SharTaskTest.SharpTaskTaskTriggerTest
 {
-
     public class TriggerWeekdayTest
     {
         private ITriggerInterface GetTriggerTime()
@@ -14,7 +13,7 @@ namespace SharTaskTest.SharpTaskTaskTriggerTest
             {
                 DayOfWeek.Monday
             };
-            return new TriggerWeekday(new StDate(2017,1,1), new StTime(12,0,0), wdl);
+            return new TriggerWeekday(new StDate(2017, 1, 1), new StTime(12, 0, 0), wdl);
         }
 
         [Fact]
@@ -22,7 +21,7 @@ namespace SharTaskTest.SharpTaskTaskTriggerTest
         {
             var dt = new DateTime(2017, 1, 1, 12, 0, 0, 0); // Sunday
             var wd = GetTriggerTime();
-            Assert.IsFalse(wd.ShouldRunNow(dt));
+            Assert.False(wd.ShouldRunNow(dt));
         }
 
         [Fact]
@@ -30,7 +29,7 @@ namespace SharTaskTest.SharpTaskTaskTriggerTest
         {
             var dt = new DateTime(2017, 1, 3, 12, 0, 0); // Tuesday
             var wd = GetTriggerTime();
-            Assert.IsFalse(wd.ShouldRunNow(dt));
+            Assert.False(wd.ShouldRunNow(dt));
         }
 
         [Fact]
@@ -38,7 +37,7 @@ namespace SharTaskTest.SharpTaskTaskTriggerTest
         {
             var dt = new DateTime(2017, 1, 2, 12, 0, 10); // Monday
             var wd = GetTriggerTime();
-            Assert.IsFalse(wd.ShouldRunNow(dt));
+            Assert.False(wd.ShouldRunNow(dt));
         }
 
         [Fact]
@@ -46,7 +45,7 @@ namespace SharTaskTest.SharpTaskTaskTriggerTest
         {
             var dt = new DateTime(2017, 1, 2, 11, 59, 59); // Monday
             var wd = GetTriggerTime();
-            Assert.IsFalse(wd.ShouldRunNow(dt));
+            Assert.False(wd.ShouldRunNow(dt));
         }
 
         [Fact]
@@ -54,7 +53,7 @@ namespace SharTaskTest.SharpTaskTaskTriggerTest
         {
             var dt = new DateTime(2017, 1, 2, 12, 0, 10); // Monday
             var wd = GetTriggerTime();
-            Assert.IsFalse(wd.ShouldRunNow(dt));
+            Assert.False(wd.ShouldRunNow(dt));
         }
 
         [Fact]
@@ -62,8 +61,7 @@ namespace SharTaskTest.SharpTaskTaskTriggerTest
         {
             var dt = new DateTime(2017, 1, 2, 12, 0, 5); // Monday
             var wd = GetTriggerTime();
-            Assert.IsTrue(wd.ShouldRunNow(dt));
+            Assert.True(wd.ShouldRunNow(dt));
         }
-
     }
 }

@@ -1,5 +1,5 @@
-﻿using Xunit;
-using SharpTask.Task;
+﻿using SharpTask.Task;
+using Xunit;
 
 namespace SharTaskTest.Misc
 {
@@ -9,38 +9,39 @@ namespace SharTaskTest.Misc
         public void RunResultFinishedUnsucsecfull()
         {
             var t = new RunResult(true,false);
-            Assert.IsTrue(t.TaskFinished);
-            Assert.IsFalse(t.Sucessfull);
+            Assert.True(t.TaskFinished);
+            Assert.False(t.Sucessfull);
         }
 
         [Fact]
         public void RunResultUnfinishedSucess()
         {
             var t = new RunResult(false, true);
-            Assert.IsFalse(t.TaskFinished);
-            Assert.IsTrue(t.Sucessfull);
+            Assert.False(t.TaskFinished);
+            Assert.True(t.Sucessfull);
         }
+
         [Fact]
         public void RunResultUnfinishedUnsucess()
         {
             var t = new RunResult(false, false);
-            Assert.IsFalse(t.Sucessfull);
-            Assert.IsFalse(t.TaskFinished);
+            Assert.False(t.Sucessfull);
+            Assert.False(t.TaskFinished);
         }
+
         [Fact]
-        public void RunResultFinishedSucess()
+        public void RunResultFinishedSuccess()
         {
             var t = new RunResult(true,true);
-            Assert.IsTrue(t.Sucessfull);
-            Assert.IsTrue(t.TaskFinished);
+            Assert.True(t.Sucessfull);
+            Assert.True(t.TaskFinished);
         }
 
         [Fact]
         public void RunResultLogLines()
         {
             var t = new RunResult(false, false);
-            Assert.IsTrue(t.LogLines != null);
+            Assert.True(t.LogLines != null);
         }
-
     }
 }

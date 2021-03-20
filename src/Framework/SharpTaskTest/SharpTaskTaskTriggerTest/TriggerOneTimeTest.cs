@@ -1,35 +1,33 @@
 ﻿using System;
-using NUnit.Framework;
 using SharpTask.Task;
+using Xunit;
 
 namespace SharTaskTest.SharpTaskTaskTriggerTest
 {
-    [TestFixture]
     public class OneTimeTriggerTest
     {
-
-        [Test]
+        [Fact]
         public void TestBeforeTime()
         {
             var dt = new DateTime(2017, 1, 1, 12, 0, 0);
             var ott = new TriggerOneTime(new StDate(dt), new StTime(dt));
-            Assert.IsFalse(ott.ShouldRunNow(dt.AddSeconds(-1)));
+            Assert.False(ott.ShouldRunNow(dt.AddSeconds(-1)));
         }
 
-        [Test]
+        [Fact]
         public void TestAfterTimeOneSencond()
         {
             var dt = new DateTime(2017, 1, 1, 12, 0, 0);
             var ott = new TriggerOneTime(new StDate(dt), new StTime(dt));
-            Assert.IsTrue(ott.ShouldRunNow(dt.AddSeconds(1)));
+            Assert.True(ott.ShouldRunNow(dt.AddSeconds(1)));
         }
 
-        [Test]
+        [Fact]
         public void TestOnTime()
         {
             var dt = new DateTime(2017, 1, 1, 12, 0, 0);
             var ott = new TriggerOneTime(new StDate(dt), new StTime(dt));
-            Assert.IsTrue(ott.ShouldRunNow(dt));
+            Assert.True(ott.ShouldRunNow(dt));
         }
     }
 }

@@ -1,49 +1,45 @@
 ﻿using System;
-using NUnit.Framework;
 using SharpTask.Task;
+using Xunit;
 
 namespace SharTaskTest.SharpTaskTaskTriggerTest
 {
-    [TestFixture]
     public class TriggerRepeatEveryHourTest
     {
-
-        [Test]
+        [Fact]
         public void TestBeforeTime()
         {
             var dt = new DateTime(2017, 1, 1, 12, 2, 0);
             var ott = new TriggerRepeatEveryHour(1);
-            Assert.IsFalse(ott.ShouldRunNow(dt));
+            Assert.False(ott.ShouldRunNow(dt));
         }
 
-        [Test]
+        [Fact]
         public void TestAfterTimeOneSecond()
         {
             var dt = new DateTime(2017, 1, 1, 12, 2, 0);
             var ott = new TriggerRepeatEveryHour(2);
-            Assert.IsTrue(ott.ShouldRunNow(dt.AddSeconds(1)));
+            Assert.True(ott.ShouldRunNow(dt.AddSeconds(1)));
 
             dt = new DateTime(2017, 1, 1, 12, 3, 0);
             ott = new TriggerRepeatEveryHour(2);
-            Assert.IsFalse(ott.ShouldRunNow(dt.AddSeconds(1)));
-
+            Assert.False(ott.ShouldRunNow(dt.AddSeconds(1)));
         }
 
-        [Test]
+        [Fact]
         public void TestOnTime()
         {
             var dt = new DateTime(2017, 1, 1, 12, 3, 0);
             var ott = new TriggerRepeatEveryHour(3);
-            Assert.IsTrue(ott.ShouldRunNow(dt));
+            Assert.True(ott.ShouldRunNow(dt));
         }
 
-        [Test]
+        [Fact]
         public void TestAfterTime()
         {
             var dt = new DateTime(2017, 1, 1, 12, 5, 0);
             var ott = new TriggerRepeatEveryHour(4);
-            Assert.IsFalse(ott.ShouldRunNow(dt));
+            Assert.False(ott.ShouldRunNow(dt));
         }
-
     }
 }
